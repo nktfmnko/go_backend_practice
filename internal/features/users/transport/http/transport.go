@@ -1,0 +1,34 @@
+package users_transport_http
+
+import (
+	"context"
+	"net/http"
+	"practice/internal/core/domain"
+	core_http_server "practice/internal/core/transport/http/server"
+)
+
+type UsersHTTPHandler struct {
+	usersService UsersService
+}
+
+type UsersService interface {
+	CreateUser(
+		ctx context.Context,
+		fullName string,
+		phoneNumber *string,
+	) (domain.User, error)
+}
+
+func NewUsersHTTPHandler(service UsersService) *UsersHTTPHandler {
+	return &UsersHTTPHandler{usersService: service}
+}
+
+func (h *UsersHTTPHandler) Routes() []core_http_server.Route {
+	return []core_http_server.Route{
+		{
+			Method:  http.MethodPost,
+			Path:    "/users",
+			Handler: h.CreateUser,
+		},
+	}
+}
