@@ -17,6 +17,10 @@ type UsersService interface {
 		fullName string,
 		phoneNumber *string,
 	) (domain.User, error)
+	GetUsers(
+		ctx context.Context,
+		limit, offset *int,
+	) ([]domain.User, error)
 }
 
 func NewUsersHTTPHandler(service UsersService) *UsersHTTPHandler {
@@ -29,6 +33,11 @@ func (h *UsersHTTPHandler) Routes() []core_http_server.Route {
 			Method:  http.MethodPost,
 			Path:    "/users",
 			Handler: h.CreateUser,
+		},
+		{
+			Method:  http.MethodGet,
+			Path:    "/users",
+			Handler: h.GetUsers,
 		},
 	}
 }

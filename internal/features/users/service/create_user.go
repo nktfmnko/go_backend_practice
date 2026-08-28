@@ -6,7 +6,7 @@ import (
 	"practice/internal/core/domain"
 )
 
-func (s UsersService) CreateUser(ctx context.Context, fullName string, phoneNumber *string) (domain.User, error) {
+func (s *UsersService) CreateUser(ctx context.Context, fullName string, phoneNumber *string) (domain.User, error) {
 	user := domain.NewUserUninitialized(fullName, phoneNumber)
 	if err := user.Validate(); err != nil {
 		return domain.User{}, fmt.Errorf("validate user domain: %w", err)
