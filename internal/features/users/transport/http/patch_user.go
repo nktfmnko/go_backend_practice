@@ -8,7 +8,6 @@ import (
 	core_http_request "practice/internal/core/transport/http/request"
 	core_http_response "practice/internal/core/transport/http/response"
 	core_http_types "practice/internal/core/transport/http/types"
-	core_http_utils "practice/internal/core/transport/http/utils"
 	"strings"
 )
 
@@ -53,7 +52,7 @@ func (h *UsersHTTPHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 
 	responseHandler := core_http_response.NewHttpResponseHandler(logger, w)
 
-	userId, err := core_http_utils.GetIntPathValue(r, "id")
+	userId, err := core_http_request.GetIntPathValue(r, "id")
 	if err != nil {
 		responseHandler.ErrorResponse(err, "fail to get user id")
 		return
@@ -65,7 +64,7 @@ func (h *UsersHTTPHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userPatch := userPatchFromRequest(request)
+	userPatch := domain.NewUserPatch(request.FullName.ToDomain(), request.PhoneNumber.ToDomain())
 
 	userDomain, err := h.usersService.PatchUser(ctx, userId, userPatch)
 	if err != nil {
@@ -76,11 +75,4 @@ func (h *UsersHTTPHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 	response := PatchUserResponse(userDTOFromDomain(userDomain))
 
 	responseHandler.JSONResponse(response, http.StatusOK)
-}
-
-func userPatchFromRequest(request PatchUserRequest) domain.UserPatch {
-	return domain.UserPatch{
-		FullName:    request.FullName.ToDomain(),
-		PhoneNumber: request.PhoneNumber.ToDomain(),
-	}
 }
