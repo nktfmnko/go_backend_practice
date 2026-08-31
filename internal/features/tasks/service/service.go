@@ -18,4 +18,8 @@ type TasksRepository interface {
 		ctx context.Context,
 		task domain.Task,
 	) (domain.Task, error)
+	GetTask(
+		ctx context.Context,
+		id int,
+	) (domain.Task, error)
 }
