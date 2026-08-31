@@ -32,6 +32,11 @@ type TasksService interface {
 		ctx context.Context,
 		id int,
 	) error
+	PatchTask(
+		ctx context.Context,
+		id int,
+		patch domain.TaskPatch,
+	) (domain.Task, error)
 }
 
 func (h *TasksHTTPHandler) Routes() []core_http_server.Route {
@@ -55,6 +60,11 @@ func (h *TasksHTTPHandler) Routes() []core_http_server.Route {
 			Method:  http.MethodDelete,
 			Path:    "/tasks/{id}",
 			Handler: h.DeleteTask,
+		},
+		{
+			Method:  http.MethodPatch,
+			Path:    "/tasks/{id}",
+			Handler: h.PatchTask,
 		},
 	}
 }
