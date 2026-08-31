@@ -41,16 +41,7 @@ func (r *TasksRepository) GetTask(ctx context.Context, id int) (domain.Task, err
 		return domain.Task{}, fmt.Errorf("scan error: %w", err)
 	}
 
-	task := domain.NewTask(
-		taskModel.ID,
-		taskModel.Version,
-		taskModel.Title,
-		taskModel.Description,
-		taskModel.Completed,
-		taskModel.CreatedAt,
-		taskModel.CompletedAt,
-		taskModel.AuthorUserID,
-	)
+	task := taskDomainFromModel(taskModel)
 
 	return task, nil
 }
