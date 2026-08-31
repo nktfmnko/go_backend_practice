@@ -28,3 +28,12 @@ func taskDTOFromDomain(task domain.Task) TaskDTOResponse {
 		AuthorUserID: task.AuthorUserID,
 	}
 }
+
+func tasksDTOFromDomains(tasks []domain.Task) []TaskDTOResponse {
+	taskDTOs := make([]TaskDTOResponse, len(tasks))
+
+	for i, task := range tasks {
+		taskDTOs[i] = taskDTOFromDomain(task)
+	}
+	return taskDTOs
+}
