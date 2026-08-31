@@ -7,9 +7,7 @@ import (
 	core_http_response "practice/internal/core/transport/http/response"
 )
 
-type GetTaskResponse TaskDTOResponse
-
-func (h *TasksHTTPHandler) GetTask(w http.ResponseWriter, r *http.Request) {
+func (h *TasksHTTPHandler) DeleteTask(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := core_logger.FromContext(ctx)
 
@@ -17,16 +15,14 @@ func (h *TasksHTTPHandler) GetTask(w http.ResponseWriter, r *http.Request) {
 
 	taskID, err := core_http_request.GetIntPathValue(r, "id")
 	if err != nil {
-		responseHandler.ErrorResponse(err, "invalid path value id")
+		responseHandler.ErrorResponse(err, "invalid id")
 		return
 	}
 
-	task, err := h.tasksService.GetTask(ctx, taskID)
-	if err != nil {
-		responseHandler.ErrorResponse(err, "get task")
+	if err := h.tasksService.DeleteTask(ctx, taskID); err != nil {
+		responseHandler.ErrorResponse(err, "fail to delete task")
 		return
 	}
 
-	response := GetTaskResponse(taskDTOFromDomain(task))
-	responseHandler.JSONResponse(response, http.StatusOK)
+	responseHandler.NoContentResponse()
 }
