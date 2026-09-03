@@ -15,6 +15,7 @@
 - golang-migrate
 
 <h3>Архитектура</h3>
+Проект построен с использованием многослойной архитектуры:
 
 HTTP Request → Handler → Service → Repository → PostgreSQL
 
@@ -22,22 +23,28 @@ HTTP Request → Handler → Service → Repository → PostgreSQL
 
 **Users**
 
-| Method	| Endpoint |	Description |
+| Метод	| Эндпоинт |	Описание |
 | -------- | -------- | -------- |
-| POST | /users | Create user |
-| GET	| /users/{id}	| Get user |
-| GET	| /users	| Get users |
-| PATCH	| /users/{id}	| Update user|
-| DELETE | /users/{id}	| Delete user |
+| POST | /users | Создание пользователя |
+| GET	| /users/{id}	| Получение пользователя |
+| GET	| /users	| Получение списка пользователей |
+| PATCH	| /users/{id}	| Обновление пользователя |
+| DELETE | /users/{id}	| Удаление пользователя |
 
 **Tasks**
 
-| Method	| Endpoint |	Description |
+| Метод	| Эндпоинт |	Описание |
 | -------- | -------- | -------- |
-| POST | /tasks | Create task |
-| GET	| /tasks/{id}	| Get task |
-| GET	| /tasks	| Get tasks |
-| PATCH	| /tasks/{id}	| Update task|
-| DELETE | /tasks/{id}	| Delete task |
+| POST | /tasks | Создание задачи |
+| GET	| /tasks/{id}	| Получение задачи |
+| GET	| /tasks	| Получение списка задач |
+| PATCH	| /tasks/{id}	| Обновление задачи |
+| DELETE | /tasks/{id}	| Удаление задачи |
+
+**Statistics**
+
+| Метод	| Эндпоинт |	Описание |
+| -------- | -------- | -------- |
+| GET	| /statistics	| Получение статистики по задачам |
 
 
