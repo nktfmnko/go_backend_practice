@@ -18,7 +18,7 @@ var key = loggerContextKey{}
 type Logger struct {
 	*zap.Logger
 
-	file *os.File
+	File *os.File
 }
 
 func ToContext(ctx context.Context, log *Logger) context.Context {
@@ -67,19 +67,19 @@ func NewLogger(config Config) (*Logger, error) {
 
 	return &Logger{
 		Logger: zapLogger,
-		file:   logFile,
+		File:   logFile,
 	}, nil
 }
 
 func (l *Logger) With(field ...zap.Field) *Logger {
 	return &Logger{
 		Logger: l.Logger.With(field...),
-		file:   l.file,
+		File:   l.File,
 	}
 }
 
 func (l *Logger) Close() {
-	if err := l.file.Close(); err != nil {
+	if err := l.File.Close(); err != nil {
 		fmt.Println("failed to close app logger:", err)
 	}
 }
