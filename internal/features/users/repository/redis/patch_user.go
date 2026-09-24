@@ -6,12 +6,12 @@ import (
 )
 
 func (r *CachedUsersRepository) PatchUser(ctx context.Context, id int, user domain.User) (domain.User, error) {
-	user, err := r.next.PatchUser(ctx, id, user)
+	patched, err := r.next.PatchUser(ctx, id, user)
 	if err != nil {
 		return domain.User{}, err
 	}
 
 	_ = r.rdb.Del(ctx, r.getUserKey(id)).Err()
 
-	return user, err
+	return patched, nil
 }

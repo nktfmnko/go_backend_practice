@@ -14,6 +14,7 @@ import (
 	statistics_service "practice/internal/features/statistics/service"
 	statistics_transport_http "practice/internal/features/statistics/transport/http"
 	tasks_postgres_repository "practice/internal/features/tasks/repository/postgres"
+	tasks_redis_repository "practice/internal/features/tasks/repository/redis"
 	tasks_service "practice/internal/features/tasks/service"
 	tasks_transport_http "practice/internal/features/tasks/transport/http"
 	users_postgres_repository "practice/internal/features/users/repository/postgres"
@@ -28,7 +29,11 @@ import (
 )
 
 var timeZone = time.UTC
-var cacheTTL = 5 * time.Minute
+
+const (
+	usersCacheTTL = 5 * time.Minute
+	tasksCacheTTL = 1 * time.Minute
+)
 
 func main() {
 	_ = godotenv.Load()
@@ -70,13 +75,14 @@ func main() {
 
 	logger.Debug("init feature", zap.String("feature", "users"))
 	usersRepository := users_postgres_repository.NewUsersRepository(pool)
-	usersCachedRepository := users_redis_repository.NewCachedUsersRepository(usersRepository, redisCache, cacheTTL)
+	usersCachedRepository := users_redis_repository.NewCachedUsersRepository(usersRepository, redisCache, usersCacheTTL)
 	usersService := users_service.NewUsersService(usersCachedRepository)
 	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
 
 	logger.Debug("init feature", zap.String("feature", "tasks"))
 	tasksRepository := tasks_postgres_repository.NewTasksRepository(pool)
-	tasksService := tasks_service.NewTasksService(tasksRepository)
+	tasksCachedRepository := tasks_redis_repository.NewCachedTasksRepository(tasksRepository, redisCache, tasksCacheTTL)
+	tasksService := tasks_service.NewTasksService(tasksCachedRepository)
 	tasksTransportHTTP := tasks_transport_http.NewTasksHTTPHandler(tasksService)
 
 	logger.Debug("init feature", zap.String("feature", "statistics"))

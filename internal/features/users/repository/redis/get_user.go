@@ -15,7 +15,7 @@ func (r *CachedUsersRepository) GetUser(ctx context.Context, id int) (domain.Use
 	val, err := r.rdb.Get(ctx, key).Result()
 	if err == nil {
 		var user domain.User
-		if err := json.Unmarshal([]byte(val), &user); err != nil {
+		if err := json.Unmarshal([]byte(val), &user); err == nil {
 			return user, nil
 		}
 	} else if !errors.Is(err, redis.Nil) {
