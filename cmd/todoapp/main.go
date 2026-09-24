@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	core_logger "practice/internal/core/logger"
+	core_redis2 "practice/internal/core/repository/cache/redis"
 	"practice/internal/core/repository/postgres/pool/pgx"
 	core_http_middleware "practice/internal/core/transport/http/middleware"
 	core_http_server "practice/internal/core/transport/http/server"
@@ -16,6 +17,7 @@ import (
 	tasks_service "practice/internal/features/tasks/service"
 	tasks_transport_http "practice/internal/features/tasks/transport/http"
 	users_postgres_repository "practice/internal/features/users/repository/postgres"
+	users_redis_repository "practice/internal/features/users/repository/redis"
 	users_service "practice/internal/features/users/service"
 	users_transport_http "practice/internal/features/users/transport/http"
 	"syscall"
@@ -26,6 +28,7 @@ import (
 )
 
 var timeZone = time.UTC
+var cacheTTL = 5 * time.Minute
 
 func main() {
 	_ = godotenv.Load()
@@ -53,9 +56,22 @@ func main() {
 	}
 	defer pool.Close()
 
+	logger.Debug("init redis")
+	redisCache, err := core_redis2.NewClient(context.Background(), core_redis2.NewConfigMust())
+	if err != nil {
+		logger.Fatal("failed to init redis ", zap.Error(err))
+	}
+	defer func(redisCache *core_redis2.RedisClient) {
+		err := redisCache.Close()
+		if err != nil {
+
+		}
+	}(redisCache)
+
 	logger.Debug("init feature", zap.String("feature", "users"))
 	usersRepository := users_postgres_repository.NewUsersRepository(pool)
-	usersService := users_service.NewUsersService(usersRepository)
+	usersCachedRepository := users_redis_repository.NewCachedUsersRepository(usersRepository, redisCache, cacheTTL)
+	usersService := users_service.NewUsersService(usersCachedRepository)
 	usersTransportHTTP := users_transport_http.NewUsersHTTPHandler(usersService)
 
 	logger.Debug("init feature", zap.String("feature", "tasks"))
