@@ -12,6 +12,7 @@ import (
 	core_http_server "practice/internal/core/transport/http/server"
 	statistics_postgres_repository "practice/internal/features/statistics/repository/postgres"
 	statistics_service "practice/internal/features/statistics/service"
+	statistics_cache_service "practice/internal/features/statistics/service/cache"
 	statistics_transport_http "practice/internal/features/statistics/transport/http"
 	tasks_postgres_repository "practice/internal/features/tasks/repository/postgres"
 	tasks_redis_repository "practice/internal/features/tasks/repository/redis"
@@ -31,8 +32,9 @@ import (
 var timeZone = time.UTC
 
 const (
-	usersCacheTTL = 5 * time.Minute
-	tasksCacheTTL = 1 * time.Minute
+	usersCacheTTL      = 5 * time.Minute
+	tasksCacheTTL      = 1 * time.Minute
+	statisticsCacheTTL = 30 * time.Second
 )
 
 func main() {
@@ -88,7 +90,8 @@ func main() {
 	logger.Debug("init feature", zap.String("feature", "statistics"))
 	statisticsRepository := statistics_postgres_repository.NewStatisticsRepository(pool)
 	statisticsService := statistics_service.NewStatisticsService(statisticsRepository)
-	statisticsTransportHTTP := statistics_transport_http.NewStatisticsHTTPHandler(statisticsService)
+	statisticsCacheService := statistics_cache_service.NewStatisticsCacheService(statisticsService, redisCache, statisticsCacheTTL)
+	statisticsTransportHTTP := statistics_transport_http.NewStatisticsHTTPHandler(statisticsCacheService)
 
 	logger.Debug("init HTTP Server")
 	httpServer := core_http_server.NewHTTPServer(
