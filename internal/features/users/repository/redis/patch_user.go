@@ -2,6 +2,7 @@ package users_redis_repository
 
 import (
 	"context"
+	"log"
 	"practice/internal/core/domain"
 )
 
@@ -11,7 +12,9 @@ func (r *CachedUsersRepository) PatchUser(ctx context.Context, id int, user doma
 		return domain.User{}, err
 	}
 
-	_ = r.rdb.Del(ctx, r.getUserKey(id)).Err()
+	if err := r.rdb.Del(ctx, r.getUserKey(id)).Err(); err != nil {
+		log.Printf("ERROR: failed to delete user %d from cache: %v", id, err)
+	}
 
 	return patched, nil
 }

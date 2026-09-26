@@ -2,6 +2,7 @@ package tasks_redis_repository
 
 import (
 	"context"
+	"log"
 	"practice/internal/core/domain"
 )
 
@@ -11,7 +12,9 @@ func (r *CachedTasksRepository) PatchTask(ctx context.Context, id int, task doma
 		return domain.Task{}, err
 	}
 
-	_ = r.rdb.Del(ctx, r.getTaskKey(id)).Err()
+	if err := r.rdb.Del(ctx, r.getTaskKey(id)).Err(); err != nil {
+		log.Printf("ERROR: failed to delete task %d in cache: %v", id, err)
+	}
 
 	return patched, nil
 }

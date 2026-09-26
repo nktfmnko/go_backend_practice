@@ -7,12 +7,15 @@ import (
 	core_redis "practice/internal/core/repository/cache/redis"
 	users_service "practice/internal/features/users/service"
 	"time"
+
+	"golang.org/x/sync/singleflight"
 )
 
 type CachedUsersRepository struct {
-	next users_service.UsersRepository
-	rdb  *core_redis.RedisClient
-	ttl  time.Duration
+	next              users_service.UsersRepository
+	rdb               *core_redis.RedisClient
+	singleFlightGroup singleflight.Group
+	ttl               time.Duration
 }
 
 func (r *CachedUsersRepository) CreateUser(ctx context.Context, user domain.User) (domain.User, error) {

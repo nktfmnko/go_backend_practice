@@ -7,12 +7,15 @@ import (
 	core_redis "practice/internal/core/repository/cache/redis"
 	tasks_service "practice/internal/features/tasks/service"
 	"time"
+
+	"golang.org/x/sync/singleflight"
 )
 
 type CachedTasksRepository struct {
-	next tasks_service.TasksRepository
-	rdb  *core_redis.RedisClient
-	ttl  time.Duration
+	next              tasks_service.TasksRepository
+	rdb               *core_redis.RedisClient
+	singleFlightGroup singleflight.Group
+	ttl               time.Duration
 }
 
 func (r *CachedTasksRepository) CreateTask(ctx context.Context, task domain.Task) (domain.Task, error) {

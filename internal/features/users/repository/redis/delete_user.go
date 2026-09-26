@@ -1,6 +1,9 @@
 package users_redis_repository
 
-import "context"
+import (
+	"context"
+	"log"
+)
 
 func (r *CachedUsersRepository) DeleteUser(ctx context.Context, id int) error {
 	key := r.getUserKey(id)
@@ -8,6 +11,8 @@ func (r *CachedUsersRepository) DeleteUser(ctx context.Context, id int) error {
 		return err
 	}
 
-	_ = r.rdb.Del(ctx, key).Err()
+	if err := r.rdb.Del(ctx, key).Err(); err != nil {
+		log.Printf("ERROR: failed to delete user %d from cache: %v", id, err)
+	}
 	return nil
 }
