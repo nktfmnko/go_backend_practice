@@ -3,7 +3,11 @@ package domain
 import (
 	"fmt"
 	core_error "practice/internal/core/errors"
+	core_transport_grpc "practice/internal/core/transport/grpc"
+	v1 "practice/pkg/pb/v1"
 	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Task struct {
@@ -41,6 +45,21 @@ func NewTaskUninitialized(title string, description *string, author int) Task {
 		nil,
 		author,
 	)
+}
+
+func (t *Task) ToProto() *v1.Task {
+	return &v1.Task{
+		Id:          int64(t.ID),
+		Version:     int64(t.Version),
+		Completed:   t.Completed,
+		CreatedAt:   timestamppb.New(t.CreatedAt),
+		CompletedAt: nil,
+		Info: &v1.TaskInfo{
+			Title:        t.Title,
+			Description:  core_transport_grpc.StringToWrapper(t.Description),
+			AuthorUserId: int64(t.AuthorUserID),
+		},
+	}
 }
 
 func (t *Task) CompletionDuration() *time.Duration {
@@ -96,6 +115,14 @@ func NewTaskPatch(title Nullable[string], description Nullable[string], complete
 		Title:       title,
 		Description: description,
 		Completed:   completed,
+	}
+}
+
+func NewTaskPatchFromProto(patch *v1.TaskPatch) TaskPatch {
+	return TaskPatch{
+		Title:       NewNullableFromWrapper(patch.GetTitle()),
+		Description: NewNullableFromWrapper(patch.GetDescription()),
+		Completed:   NewNullableFromWrapper(patch.GetCompleted()),
 	}
 }
 

@@ -3,6 +3,8 @@ package domain
 import (
 	"fmt"
 	core_error "practice/internal/core/errors"
+	core_transport_grpc "practice/internal/core/transport/grpc"
+	v1 "practice/pkg/pb/v1"
 	"regexp"
 )
 
@@ -25,6 +27,17 @@ func NewUser(id, version int, fullName string, phoneNumber *string) User {
 
 func NewUserUninitialized(fullName string, phoneNumber *string) User {
 	return NewUser(UninitializedID, UninitializedVersion, fullName, phoneNumber)
+}
+
+func (u *User) ToProtoUser() *v1.User {
+	return &v1.User{
+		Id:      int64(u.ID),
+		Version: int64(u.Version),
+		Info: &v1.UserInfo{
+			FullName:    u.FullName,
+			PhoneNumber: core_transport_grpc.StringToWrapper(u.PhoneNumber),
+		},
+	}
 }
 
 func (u *User) Validate() error {
@@ -56,6 +69,13 @@ func NewUserPatch(fullName Nullable[string], phoneNumber Nullable[string]) UserP
 	return UserPatch{
 		FullName:    fullName,
 		PhoneNumber: phoneNumber,
+	}
+}
+
+func NewUserPatchFromProto(protoPatch *v1.PatchUserRequest) UserPatch {
+	return UserPatch{
+		FullName:    NewNullableFromWrapper(protoPatch.GetPatch().GetFullName()),
+		PhoneNumber: NewNullableFromWrapper(protoPatch.GetPatch().GetPhoneNumber()),
 	}
 }
 

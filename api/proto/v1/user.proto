@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package proto.v1;
+
+option go_package = "practice/pkg/pb/v1;v1";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
+
+service UsersServiceV1{
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
+  rpc PatchUser(PatchUserRequest) returns (PatchUserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
+}
+
+message UserInfo{
+  string full_name = 1;
+  google.protobuf.StringValue phone_number = 2;
+}
+
+message User{
+  int64 id = 1;
+  int64 version = 2;
+  UserInfo info = 3;
+}
+
+message UserPatch{
+  google.protobuf.StringValue full_name = 1;
+  google.protobuf.StringValue phone_number = 2;
+}
+
+message CreateUserRequest{
+  UserInfo info = 1;
+}
+
+message CreateUserResponse{
+  User user = 1;
+}
+
+message GetUserRequest{
+  int64 id = 1;
+}
+
+message GetUserResponse{
+  User user = 1;
+}
+
+message GetUsersRequest{
+  google.protobuf.Int64Value limit = 1;
+  google.protobuf.Int64Value offset = 2;
+}
+
+message GetUsersResponse{
+  repeated User users = 1;
+}
+
+message PatchUserRequest{
+  int64 id = 1;
+  UserPatch patch = 2;
+}
+
+message PatchUserResponse{
+  User user = 1;
+}
+
+message DeleteUserRequest{
+  int64 id = 1;
+}
