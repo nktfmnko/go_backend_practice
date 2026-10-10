@@ -1,12 +1,9 @@
 package core_transport_grpc
 
-import (
-	"google.golang.org/protobuf/types/known/wrapperspb"
-)
-
-func StringToWrapper(str *string) *wrapperspb.StringValue {
-	if str == nil {
+func PtrInt64ToInt(val *int64) *int {
+	if val == nil {
 		return nil
 	}
-	return wrapperspb.String(*str)
+	v := int(*val)
+	return &v
 }

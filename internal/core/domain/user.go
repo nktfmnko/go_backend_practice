@@ -3,7 +3,6 @@ package domain
 import (
 	"fmt"
 	core_error "practice/internal/core/errors"
-	core_transport_grpc "practice/internal/core/transport/grpc"
 	v1 "practice/pkg/pb/v1"
 	"regexp"
 )
@@ -35,9 +34,17 @@ func (u *User) ToProtoUser() *v1.User {
 		Version: int64(u.Version),
 		Info: &v1.UserInfo{
 			FullName:    u.FullName,
-			PhoneNumber: core_transport_grpc.StringToWrapper(u.PhoneNumber),
+			PhoneNumber: u.PhoneNumber,
 		},
 	}
+}
+
+func ProtoSliceFromUsers(domainUsers []User) []*v1.User {
+	res := make([]*v1.User, len(domainUsers))
+	for i, u := range domainUsers {
+		res[i] = u.ToProtoUser()
+	}
+	return res
 }
 
 func (u *User) Validate() error {
@@ -73,9 +80,14 @@ func NewUserPatch(fullName Nullable[string], phoneNumber Nullable[string]) UserP
 }
 
 func NewUserPatchFromProto(protoPatch *v1.PatchUserRequest) UserPatch {
+	patch := protoPatch.GetPatch()
+	if patch == nil {
+		return UserPatch{}
+	}
+
 	return UserPatch{
-		FullName:    NewNullableFromWrapper(protoPatch.GetPatch().GetFullName()),
-		PhoneNumber: NewNullableFromWrapper(protoPatch.GetPatch().GetPhoneNumber()),
+		FullName:    NewNullableFromPtr(protoPatch.GetPatch().FullName),
+		PhoneNumber: NewNullableFromPtr(protoPatch.GetPatch().PhoneNumber),
 	}
 }
 

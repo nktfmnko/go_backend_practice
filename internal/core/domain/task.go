@@ -3,7 +3,6 @@ package domain
 import (
 	"fmt"
 	core_error "practice/internal/core/errors"
-	core_transport_grpc "practice/internal/core/transport/grpc"
 	v1 "practice/pkg/pb/v1"
 	"time"
 
@@ -56,10 +55,18 @@ func (t *Task) ToProto() *v1.Task {
 		CompletedAt: nil,
 		Info: &v1.TaskInfo{
 			Title:        t.Title,
-			Description:  core_transport_grpc.StringToWrapper(t.Description),
+			Description:  t.Description,
 			AuthorUserId: int64(t.AuthorUserID),
 		},
 	}
+}
+
+func NewProtoSliceFromTasks(domainTasks []Task) []*v1.Task {
+	res := make([]*v1.Task, len(domainTasks))
+	for i, t := range domainTasks {
+		res[i] = t.ToProto()
+	}
+	return res
 }
 
 func (t *Task) CompletionDuration() *time.Duration {
@@ -118,11 +125,14 @@ func NewTaskPatch(title Nullable[string], description Nullable[string], complete
 	}
 }
 
-func NewTaskPatchFromProto(patch *v1.TaskPatch) TaskPatch {
+func NewTaskPatchFromProto(patch *v1.PatchTaskRequest) TaskPatch {
+	if patch.GetPatch() == nil {
+		return TaskPatch{}
+	}
 	return TaskPatch{
-		Title:       NewNullableFromWrapper(patch.GetTitle()),
-		Description: NewNullableFromWrapper(patch.GetDescription()),
-		Completed:   NewNullableFromWrapper(patch.GetCompleted()),
+		Title:       NewNullableFromPtr(patch.GetPatch().Title),
+		Description: NewNullableFromPtr(patch.GetPatch().Description),
+		Completed:   NewNullableFromPtr(patch.GetPatch().Completed),
 	}
 }
 

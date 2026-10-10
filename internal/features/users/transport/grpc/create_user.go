@@ -14,13 +14,7 @@ func (g *UsersGRPC) CreateUser(ctx context.Context, req *v1.CreateUserRequest) (
 		return nil, status.Error(codes.InvalidArgument, "user info is required")
 	}
 
-	var phoneNumber *string
-	if req.GetInfo().GetPhoneNumber() != nil {
-		val := req.GetInfo().GetPhoneNumber().GetValue()
-		phoneNumber = &val
-	}
-
-	user, err := g.usersService.CreateUser(ctx, req.GetInfo().GetFullName(), phoneNumber)
+	user, err := g.usersService.CreateUser(ctx, req.GetInfo().GetFullName(), req.GetInfo().PhoneNumber)
 	if err != nil {
 		return nil, core_transport_grpc.ErrorResponse(err, "failed to create user")
 	}

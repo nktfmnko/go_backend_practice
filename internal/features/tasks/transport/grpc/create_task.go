@@ -14,13 +14,8 @@ func (g *TasksGRPC) CreateTask(ctx context.Context, req *v1.CreateTaskRequest) (
 	if req.GetInfo() == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "info cannot be null")
 	}
-	var desc *string
-	if infoDesc := req.Info.GetDescription(); infoDesc != nil {
-		val := infoDesc.GetValue()
-		desc = &val
-	}
 
-	domainTask := domain.NewTaskUninitialized(req.Info.GetTitle(), desc, int(req.Info.GetAuthorUserId()))
+	domainTask := domain.NewTaskUninitialized(req.Info.GetTitle(), req.Info.Description, int(req.Info.GetAuthorUserId()))
 
 	task, err := g.service.CreateTask(ctx, domainTask)
 	if err != nil {

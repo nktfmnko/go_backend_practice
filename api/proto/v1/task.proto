@@ -4,9 +4,9 @@ package proto.v1;
 
 option go_package = "practice/pkg/pb/v1;v1";
 
-import "google/protobuf/wrappers.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 service TasksServiceV1{
   rpc CreateTask(CreateTaskRequest) returns (CreateTaskResponse);
@@ -17,8 +17,8 @@ service TasksServiceV1{
 }
 
 message TaskInfo{
-  string title = 1;
-  google.protobuf.StringValue description = 2;
+  string title = 1 [(validate.rules).string = {min_len: 1, max_len:100}];
+  optional string description = 2 [(validate.rules).string = {min_len: 1, max_len:1000}];
   int64 author_user_id = 3;
 }
 
@@ -32,9 +32,9 @@ message Task{
 }
 
 message TaskPatch{
-  google.protobuf.StringValue title = 1;
-  google.protobuf.StringValue description = 2;
-  google.protobuf.BoolValue completed = 3;
+  optional string title = 1;
+  optional string description = 2;
+  optional bool completed = 3;
 }
 
 message CreateTaskRequest{
@@ -54,9 +54,9 @@ message GetTaskResponse{
 }
 
 message GetTasksRequest{
-  google.protobuf.Int64Value user_id = 1;
-  google.protobuf.Int64Value limit = 2;
-  google.protobuf.Int64Value offset = 3;
+  optional int64 user_id = 1;
+  optional int64 limit = 2;
+  optional int64 offset = 3;
 }
 
 message GetTasksResponse{

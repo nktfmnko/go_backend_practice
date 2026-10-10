@@ -7,11 +7,11 @@
 package v1
 
 import (
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -25,10 +25,10 @@ const (
 )
 
 type TaskInfo struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Title         string                  `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
-	Description   *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	AuthorUserId  int64                   `protobuf:"varint,3,opt,name=author_user_id,json=authorUserId,proto3" json:"author_user_id,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Description   *string                `protobuf:"bytes,2,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	AuthorUserId  int64                  `protobuf:"varint,3,opt,name=author_user_id,json=authorUserId,proto3" json:"author_user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -70,11 +70,11 @@ func (x *TaskInfo) GetTitle() string {
 	return ""
 }
 
-func (x *TaskInfo) GetDescription() *wrapperspb.StringValue {
-	if x != nil {
-		return x.Description
+func (x *TaskInfo) GetDescription() string {
+	if x != nil && x.Description != nil {
+		return *x.Description
 	}
-	return nil
+	return ""
 }
 
 func (x *TaskInfo) GetAuthorUserId() int64 {
@@ -169,10 +169,10 @@ func (x *Task) GetInfo() *TaskInfo {
 }
 
 type TaskPatch struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Title         *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
-	Description   *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Completed     *wrapperspb.BoolValue   `protobuf:"bytes,3,opt,name=completed,proto3" json:"completed,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Title         *string                `protobuf:"bytes,1,opt,name=title,proto3,oneof" json:"title,omitempty"`
+	Description   *string                `protobuf:"bytes,2,opt,name=description,proto3,oneof" json:"description,omitempty"`
+	Completed     *bool                  `protobuf:"varint,3,opt,name=completed,proto3,oneof" json:"completed,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -207,25 +207,25 @@ func (*TaskPatch) Descriptor() ([]byte, []int) {
 	return file_v1_task_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *TaskPatch) GetTitle() *wrapperspb.StringValue {
-	if x != nil {
-		return x.Title
+func (x *TaskPatch) GetTitle() string {
+	if x != nil && x.Title != nil {
+		return *x.Title
 	}
-	return nil
+	return ""
 }
 
-func (x *TaskPatch) GetDescription() *wrapperspb.StringValue {
-	if x != nil {
-		return x.Description
+func (x *TaskPatch) GetDescription() string {
+	if x != nil && x.Description != nil {
+		return *x.Description
 	}
-	return nil
+	return ""
 }
 
-func (x *TaskPatch) GetCompleted() *wrapperspb.BoolValue {
-	if x != nil {
-		return x.Completed
+func (x *TaskPatch) GetCompleted() bool {
+	if x != nil && x.Completed != nil {
+		return *x.Completed
 	}
-	return nil
+	return false
 }
 
 type CreateTaskRequest struct {
@@ -406,9 +406,9 @@ func (x *GetTaskResponse) GetTask() *Task {
 
 type GetTasksRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        *wrapperspb.Int64Value `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Limit         *wrapperspb.Int64Value `protobuf:"bytes,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	Offset        *wrapperspb.Int64Value `protobuf:"bytes,3,opt,name=offset,proto3" json:"offset,omitempty"`
+	UserId        *int64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"`
+	Limit         *int64                 `protobuf:"varint,2,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
+	Offset        *int64                 `protobuf:"varint,3,opt,name=offset,proto3,oneof" json:"offset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -443,25 +443,25 @@ func (*GetTasksRequest) Descriptor() ([]byte, []int) {
 	return file_v1_task_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GetTasksRequest) GetUserId() *wrapperspb.Int64Value {
-	if x != nil {
-		return x.UserId
+func (x *GetTasksRequest) GetUserId() int64 {
+	if x != nil && x.UserId != nil {
+		return *x.UserId
 	}
-	return nil
+	return 0
 }
 
-func (x *GetTasksRequest) GetLimit() *wrapperspb.Int64Value {
-	if x != nil {
-		return x.Limit
+func (x *GetTasksRequest) GetLimit() int64 {
+	if x != nil && x.Limit != nil {
+		return *x.Limit
 	}
-	return nil
+	return 0
 }
 
-func (x *GetTasksRequest) GetOffset() *wrapperspb.Int64Value {
-	if x != nil {
-		return x.Offset
+func (x *GetTasksRequest) GetOffset() int64 {
+	if x != nil && x.Offset != nil {
+		return *x.Offset
 	}
-	return nil
+	return 0
 }
 
 type GetTasksResponse struct {
@@ -652,11 +652,13 @@ var File_v1_task_proto protoreflect.FileDescriptor
 
 const file_v1_task_proto_rawDesc = "" +
 	"\n" +
-	"\rv1/task.proto\x12\bproto.v1\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x86\x01\n" +
-	"\bTaskInfo\x12\x14\n" +
-	"\x05title\x18\x01 \x01(\tR\x05title\x12>\n" +
-	"\vdescription\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\vdescription\x12$\n" +
-	"\x0eauthor_user_id\x18\x03 \x01(\x03R\fauthorUserId\"\xf0\x01\n" +
+	"\rv1/task.proto\x12\bproto.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\"\x94\x01\n" +
+	"\bTaskInfo\x12\x1f\n" +
+	"\x05title\x18\x01 \x01(\tB\t\xfaB\x06r\x04\x10\x01\x18dR\x05title\x121\n" +
+	"\vdescription\x18\x02 \x01(\tB\n" +
+	"\xfaB\ar\x05\x10\x01\x18\xe8\aH\x00R\vdescription\x88\x01\x01\x12$\n" +
+	"\x0eauthor_user_id\x18\x03 \x01(\x03R\fauthorUserIdB\x0e\n" +
+	"\f_description\"\xf0\x01\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\x03R\aversion\x12\x1c\n" +
@@ -664,11 +666,15 @@ const file_v1_task_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12=\n" +
 	"\fcompleted_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\vcompletedAt\x12&\n" +
-	"\x04info\x18\x06 \x01(\v2\x12.proto.v1.TaskInfoR\x04info\"\xb9\x01\n" +
-	"\tTaskPatch\x122\n" +
-	"\x05title\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x05title\x12>\n" +
-	"\vdescription\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\vdescription\x128\n" +
-	"\tcompleted\x18\x03 \x01(\v2\x1a.google.protobuf.BoolValueR\tcompleted\";\n" +
+	"\x04info\x18\x06 \x01(\v2\x12.proto.v1.TaskInfoR\x04info\"\x98\x01\n" +
+	"\tTaskPatch\x12\x19\n" +
+	"\x05title\x18\x01 \x01(\tH\x00R\x05title\x88\x01\x01\x12%\n" +
+	"\vdescription\x18\x02 \x01(\tH\x01R\vdescription\x88\x01\x01\x12!\n" +
+	"\tcompleted\x18\x03 \x01(\bH\x02R\tcompleted\x88\x01\x01B\b\n" +
+	"\x06_titleB\x0e\n" +
+	"\f_descriptionB\f\n" +
+	"\n" +
+	"_completed\";\n" +
 	"\x11CreateTaskRequest\x12&\n" +
 	"\x04info\x18\x01 \x01(\v2\x12.proto.v1.TaskInfoR\x04info\"8\n" +
 	"\x12CreateTaskResponse\x12\"\n" +
@@ -676,11 +682,15 @@ const file_v1_task_proto_rawDesc = "" +
 	"\x0eGetTaskRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"5\n" +
 	"\x0fGetTaskResponse\x12\"\n" +
-	"\x04task\x18\x01 \x01(\v2\x0e.proto.v1.TaskR\x04task\"\xaf\x01\n" +
-	"\x0fGetTasksRequest\x124\n" +
-	"\auser_id\x18\x01 \x01(\v2\x1b.google.protobuf.Int64ValueR\x06userId\x121\n" +
-	"\x05limit\x18\x02 \x01(\v2\x1b.google.protobuf.Int64ValueR\x05limit\x123\n" +
-	"\x06offset\x18\x03 \x01(\v2\x1b.google.protobuf.Int64ValueR\x06offset\"8\n" +
+	"\x04task\x18\x01 \x01(\v2\x0e.proto.v1.TaskR\x04task\"\x88\x01\n" +
+	"\x0fGetTasksRequest\x12\x1c\n" +
+	"\auser_id\x18\x01 \x01(\x03H\x00R\x06userId\x88\x01\x01\x12\x19\n" +
+	"\x05limit\x18\x02 \x01(\x03H\x01R\x05limit\x88\x01\x01\x12\x1b\n" +
+	"\x06offset\x18\x03 \x01(\x03H\x02R\x06offset\x88\x01\x01B\n" +
+	"\n" +
+	"\b_user_idB\b\n" +
+	"\x06_limitB\t\n" +
+	"\a_offset\"8\n" +
 	"\x10GetTasksResponse\x12$\n" +
 	"\x05tasks\x18\x01 \x03(\v2\x0e.proto.v1.TaskR\x05tasks\"M\n" +
 	"\x10PatchTaskRequest\x12\x0e\n" +
@@ -713,56 +723,46 @@ func file_v1_task_proto_rawDescGZIP() []byte {
 
 var file_v1_task_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_v1_task_proto_goTypes = []any{
-	(*TaskInfo)(nil),               // 0: proto.v1.TaskInfo
-	(*Task)(nil),                   // 1: proto.v1.Task
-	(*TaskPatch)(nil),              // 2: proto.v1.TaskPatch
-	(*CreateTaskRequest)(nil),      // 3: proto.v1.CreateTaskRequest
-	(*CreateTaskResponse)(nil),     // 4: proto.v1.CreateTaskResponse
-	(*GetTaskRequest)(nil),         // 5: proto.v1.GetTaskRequest
-	(*GetTaskResponse)(nil),        // 6: proto.v1.GetTaskResponse
-	(*GetTasksRequest)(nil),        // 7: proto.v1.GetTasksRequest
-	(*GetTasksResponse)(nil),       // 8: proto.v1.GetTasksResponse
-	(*PatchTaskRequest)(nil),       // 9: proto.v1.PatchTaskRequest
-	(*PatchTaskResponse)(nil),      // 10: proto.v1.PatchTaskResponse
-	(*DeleteTaskRequest)(nil),      // 11: proto.v1.DeleteTaskRequest
-	(*wrapperspb.StringValue)(nil), // 12: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),  // 13: google.protobuf.Timestamp
-	(*wrapperspb.BoolValue)(nil),   // 14: google.protobuf.BoolValue
-	(*wrapperspb.Int64Value)(nil),  // 15: google.protobuf.Int64Value
-	(*emptypb.Empty)(nil),          // 16: google.protobuf.Empty
+	(*TaskInfo)(nil),              // 0: proto.v1.TaskInfo
+	(*Task)(nil),                  // 1: proto.v1.Task
+	(*TaskPatch)(nil),             // 2: proto.v1.TaskPatch
+	(*CreateTaskRequest)(nil),     // 3: proto.v1.CreateTaskRequest
+	(*CreateTaskResponse)(nil),    // 4: proto.v1.CreateTaskResponse
+	(*GetTaskRequest)(nil),        // 5: proto.v1.GetTaskRequest
+	(*GetTaskResponse)(nil),       // 6: proto.v1.GetTaskResponse
+	(*GetTasksRequest)(nil),       // 7: proto.v1.GetTasksRequest
+	(*GetTasksResponse)(nil),      // 8: proto.v1.GetTasksResponse
+	(*PatchTaskRequest)(nil),      // 9: proto.v1.PatchTaskRequest
+	(*PatchTaskResponse)(nil),     // 10: proto.v1.PatchTaskResponse
+	(*DeleteTaskRequest)(nil),     // 11: proto.v1.DeleteTaskRequest
+	(*timestamppb.Timestamp)(nil), // 12: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),         // 13: google.protobuf.Empty
 }
 var file_v1_task_proto_depIdxs = []int32{
-	12, // 0: proto.v1.TaskInfo.description:type_name -> google.protobuf.StringValue
-	13, // 1: proto.v1.Task.created_at:type_name -> google.protobuf.Timestamp
-	13, // 2: proto.v1.Task.completed_at:type_name -> google.protobuf.Timestamp
-	0,  // 3: proto.v1.Task.info:type_name -> proto.v1.TaskInfo
-	12, // 4: proto.v1.TaskPatch.title:type_name -> google.protobuf.StringValue
-	12, // 5: proto.v1.TaskPatch.description:type_name -> google.protobuf.StringValue
-	14, // 6: proto.v1.TaskPatch.completed:type_name -> google.protobuf.BoolValue
-	0,  // 7: proto.v1.CreateTaskRequest.info:type_name -> proto.v1.TaskInfo
-	1,  // 8: proto.v1.CreateTaskResponse.task:type_name -> proto.v1.Task
-	1,  // 9: proto.v1.GetTaskResponse.task:type_name -> proto.v1.Task
-	15, // 10: proto.v1.GetTasksRequest.user_id:type_name -> google.protobuf.Int64Value
-	15, // 11: proto.v1.GetTasksRequest.limit:type_name -> google.protobuf.Int64Value
-	15, // 12: proto.v1.GetTasksRequest.offset:type_name -> google.protobuf.Int64Value
-	1,  // 13: proto.v1.GetTasksResponse.tasks:type_name -> proto.v1.Task
-	2,  // 14: proto.v1.PatchTaskRequest.patch:type_name -> proto.v1.TaskPatch
-	1,  // 15: proto.v1.PatchTaskResponse.task:type_name -> proto.v1.Task
-	3,  // 16: proto.v1.TasksServiceV1.CreateTask:input_type -> proto.v1.CreateTaskRequest
-	5,  // 17: proto.v1.TasksServiceV1.GetTask:input_type -> proto.v1.GetTaskRequest
-	7,  // 18: proto.v1.TasksServiceV1.GetTasks:input_type -> proto.v1.GetTasksRequest
-	9,  // 19: proto.v1.TasksServiceV1.PatchTask:input_type -> proto.v1.PatchTaskRequest
-	11, // 20: proto.v1.TasksServiceV1.DeleteTask:input_type -> proto.v1.DeleteTaskRequest
-	4,  // 21: proto.v1.TasksServiceV1.CreateTask:output_type -> proto.v1.CreateTaskResponse
-	6,  // 22: proto.v1.TasksServiceV1.GetTask:output_type -> proto.v1.GetTaskResponse
-	8,  // 23: proto.v1.TasksServiceV1.GetTasks:output_type -> proto.v1.GetTasksResponse
-	10, // 24: proto.v1.TasksServiceV1.PatchTask:output_type -> proto.v1.PatchTaskResponse
-	16, // 25: proto.v1.TasksServiceV1.DeleteTask:output_type -> google.protobuf.Empty
-	21, // [21:26] is the sub-list for method output_type
-	16, // [16:21] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	12, // 0: proto.v1.Task.created_at:type_name -> google.protobuf.Timestamp
+	12, // 1: proto.v1.Task.completed_at:type_name -> google.protobuf.Timestamp
+	0,  // 2: proto.v1.Task.info:type_name -> proto.v1.TaskInfo
+	0,  // 3: proto.v1.CreateTaskRequest.info:type_name -> proto.v1.TaskInfo
+	1,  // 4: proto.v1.CreateTaskResponse.task:type_name -> proto.v1.Task
+	1,  // 5: proto.v1.GetTaskResponse.task:type_name -> proto.v1.Task
+	1,  // 6: proto.v1.GetTasksResponse.tasks:type_name -> proto.v1.Task
+	2,  // 7: proto.v1.PatchTaskRequest.patch:type_name -> proto.v1.TaskPatch
+	1,  // 8: proto.v1.PatchTaskResponse.task:type_name -> proto.v1.Task
+	3,  // 9: proto.v1.TasksServiceV1.CreateTask:input_type -> proto.v1.CreateTaskRequest
+	5,  // 10: proto.v1.TasksServiceV1.GetTask:input_type -> proto.v1.GetTaskRequest
+	7,  // 11: proto.v1.TasksServiceV1.GetTasks:input_type -> proto.v1.GetTasksRequest
+	9,  // 12: proto.v1.TasksServiceV1.PatchTask:input_type -> proto.v1.PatchTaskRequest
+	11, // 13: proto.v1.TasksServiceV1.DeleteTask:input_type -> proto.v1.DeleteTaskRequest
+	4,  // 14: proto.v1.TasksServiceV1.CreateTask:output_type -> proto.v1.CreateTaskResponse
+	6,  // 15: proto.v1.TasksServiceV1.GetTask:output_type -> proto.v1.GetTaskResponse
+	8,  // 16: proto.v1.TasksServiceV1.GetTasks:output_type -> proto.v1.GetTasksResponse
+	10, // 17: proto.v1.TasksServiceV1.PatchTask:output_type -> proto.v1.PatchTaskResponse
+	13, // 18: proto.v1.TasksServiceV1.DeleteTask:output_type -> google.protobuf.Empty
+	14, // [14:19] is the sub-list for method output_type
+	9,  // [9:14] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_v1_task_proto_init() }
@@ -770,6 +770,9 @@ func file_v1_task_proto_init() {
 	if File_v1_task_proto != nil {
 		return
 	}
+	file_v1_task_proto_msgTypes[0].OneofWrappers = []any{}
+	file_v1_task_proto_msgTypes[2].OneofWrappers = []any{}
+	file_v1_task_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

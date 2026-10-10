@@ -15,7 +15,7 @@ func (g *TasksGRPC) PatchTask(ctx context.Context, req *v1.PatchTaskRequest) (*v
 		return nil, status.Errorf(codes.InvalidArgument, "patch cannot be nil")
 	}
 
-	patchTask := domain.NewTaskPatchFromProto(req.GetPatch())
+	patchTask := domain.NewTaskPatchFromProto(req)
 	task, err := g.service.PatchTask(ctx, int(req.GetId()), patchTask)
 	if err != nil {
 		return nil, core_transport_grpc.ErrorResponse(err, "failed to patch user")

@@ -120,3 +120,19 @@ func PanicUnaryServerInterceptor() grpc.UnaryServerInterceptor {
 		return handler(ctx, req)
 	}
 }
+
+type validator interface {
+	Validate() error
+}
+
+func ValidationUnaryServerInterceptor() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
+		if v, ok := req.(validator); ok {
+			if err := v.Validate(); err != nil {
+				return nil, status.Errorf(codes.InvalidArgument, "validation err: %v", err)
+			}
+		}
+
+		return handler(ctx, req)
+	}
+}

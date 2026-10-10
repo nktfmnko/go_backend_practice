@@ -7,10 +7,10 @@
 package v1
 
 import (
+	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	wrapperspb "google.golang.org/protobuf/types/known/wrapperspb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -24,9 +24,9 @@ const (
 )
 
 type UserInfo struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	FullName      string                  `protobuf:"bytes,1,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
-	PhoneNumber   *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FullName      string                 `protobuf:"bytes,1,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
+	PhoneNumber   *string                `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -68,11 +68,11 @@ func (x *UserInfo) GetFullName() string {
 	return ""
 }
 
-func (x *UserInfo) GetPhoneNumber() *wrapperspb.StringValue {
-	if x != nil {
-		return x.PhoneNumber
+func (x *UserInfo) GetPhoneNumber() string {
+	if x != nil && x.PhoneNumber != nil {
+		return *x.PhoneNumber
 	}
-	return nil
+	return ""
 }
 
 type User struct {
@@ -136,9 +136,9 @@ func (x *User) GetInfo() *UserInfo {
 }
 
 type UserPatch struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
-	FullName      *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=full_name,json=fullName,proto3" json:"full_name,omitempty"`
-	PhoneNumber   *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FullName      *string                `protobuf:"bytes,1,opt,name=full_name,json=fullName,proto3,oneof" json:"full_name,omitempty"`
+	PhoneNumber   *string                `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -173,18 +173,18 @@ func (*UserPatch) Descriptor() ([]byte, []int) {
 	return file_v1_user_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UserPatch) GetFullName() *wrapperspb.StringValue {
-	if x != nil {
-		return x.FullName
+func (x *UserPatch) GetFullName() string {
+	if x != nil && x.FullName != nil {
+		return *x.FullName
 	}
-	return nil
+	return ""
 }
 
-func (x *UserPatch) GetPhoneNumber() *wrapperspb.StringValue {
-	if x != nil {
-		return x.PhoneNumber
+func (x *UserPatch) GetPhoneNumber() string {
+	if x != nil && x.PhoneNumber != nil {
+		return *x.PhoneNumber
 	}
-	return nil
+	return ""
 }
 
 type CreateUserRequest struct {
@@ -365,8 +365,8 @@ func (x *GetUserResponse) GetUser() *User {
 
 type GetUsersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Limit         *wrapperspb.Int64Value `protobuf:"bytes,1,opt,name=limit,proto3" json:"limit,omitempty"`
-	Offset        *wrapperspb.Int64Value `protobuf:"bytes,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Limit         *int64                 `protobuf:"varint,1,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
+	Offset        *int64                 `protobuf:"varint,2,opt,name=offset,proto3,oneof" json:"offset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -401,18 +401,18 @@ func (*GetUsersRequest) Descriptor() ([]byte, []int) {
 	return file_v1_user_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GetUsersRequest) GetLimit() *wrapperspb.Int64Value {
-	if x != nil {
-		return x.Limit
+func (x *GetUsersRequest) GetLimit() int64 {
+	if x != nil && x.Limit != nil {
+		return *x.Limit
 	}
-	return nil
+	return 0
 }
 
-func (x *GetUsersRequest) GetOffset() *wrapperspb.Int64Value {
-	if x != nil {
-		return x.Offset
+func (x *GetUsersRequest) GetOffset() int64 {
+	if x != nil && x.Offset != nil {
+		return *x.Offset
 	}
-	return nil
+	return 0
 }
 
 type GetUsersResponse struct {
@@ -603,17 +603,22 @@ var File_v1_user_proto protoreflect.FileDescriptor
 
 const file_v1_user_proto_rawDesc = "" +
 	"\n" +
-	"\rv1/user.proto\x12\bproto.v1\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x1bgoogle/protobuf/empty.proto\"h\n" +
-	"\bUserInfo\x12\x1b\n" +
-	"\tfull_name\x18\x01 \x01(\tR\bfullName\x12?\n" +
-	"\fphone_number\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\vphoneNumber\"X\n" +
+	"\rv1/user.proto\x12\bproto.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17validate/validate.proto\"y\n" +
+	"\bUserInfo\x12&\n" +
+	"\tfull_name\x18\x01 \x01(\tB\t\xfaB\x06r\x04\x10\x03\x18dR\bfullName\x124\n" +
+	"\fphone_number\x18\x02 \x01(\tB\f\xfaB\tr\a\x10\n" +
+	"\x18\x0f:\x01+H\x00R\vphoneNumber\x88\x01\x01B\x0f\n" +
+	"\r_phone_number\"X\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\x03R\aversion\x12&\n" +
-	"\x04info\x18\x03 \x01(\v2\x12.proto.v1.UserInfoR\x04info\"\x87\x01\n" +
-	"\tUserPatch\x129\n" +
-	"\tfull_name\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\bfullName\x12?\n" +
-	"\fphone_number\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\vphoneNumber\";\n" +
+	"\x04info\x18\x03 \x01(\v2\x12.proto.v1.UserInfoR\x04info\"t\n" +
+	"\tUserPatch\x12 \n" +
+	"\tfull_name\x18\x01 \x01(\tH\x00R\bfullName\x88\x01\x01\x12&\n" +
+	"\fphone_number\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01B\f\n" +
+	"\n" +
+	"_full_nameB\x0f\n" +
+	"\r_phone_number\";\n" +
 	"\x11CreateUserRequest\x12&\n" +
 	"\x04info\x18\x01 \x01(\v2\x12.proto.v1.UserInfoR\x04info\"8\n" +
 	"\x12CreateUserResponse\x12\"\n" +
@@ -621,10 +626,12 @@ const file_v1_user_proto_rawDesc = "" +
 	"\x0eGetUserRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\"5\n" +
 	"\x0fGetUserResponse\x12\"\n" +
-	"\x04user\x18\x01 \x01(\v2\x0e.proto.v1.UserR\x04user\"y\n" +
-	"\x0fGetUsersRequest\x121\n" +
-	"\x05limit\x18\x01 \x01(\v2\x1b.google.protobuf.Int64ValueR\x05limit\x123\n" +
-	"\x06offset\x18\x02 \x01(\v2\x1b.google.protobuf.Int64ValueR\x06offset\"8\n" +
+	"\x04user\x18\x01 \x01(\v2\x0e.proto.v1.UserR\x04user\"^\n" +
+	"\x0fGetUsersRequest\x12\x19\n" +
+	"\x05limit\x18\x01 \x01(\x03H\x00R\x05limit\x88\x01\x01\x12\x1b\n" +
+	"\x06offset\x18\x02 \x01(\x03H\x01R\x06offset\x88\x01\x01B\b\n" +
+	"\x06_limitB\t\n" +
+	"\a_offset\"8\n" +
 	"\x10GetUsersResponse\x12$\n" +
 	"\x05users\x18\x01 \x03(\v2\x0e.proto.v1.UserR\x05users\"M\n" +
 	"\x10PatchUserRequest\x12\x0e\n" +
@@ -657,50 +664,43 @@ func file_v1_user_proto_rawDescGZIP() []byte {
 
 var file_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_v1_user_proto_goTypes = []any{
-	(*UserInfo)(nil),               // 0: proto.v1.UserInfo
-	(*User)(nil),                   // 1: proto.v1.User
-	(*UserPatch)(nil),              // 2: proto.v1.UserPatch
-	(*CreateUserRequest)(nil),      // 3: proto.v1.CreateUserRequest
-	(*CreateUserResponse)(nil),     // 4: proto.v1.CreateUserResponse
-	(*GetUserRequest)(nil),         // 5: proto.v1.GetUserRequest
-	(*GetUserResponse)(nil),        // 6: proto.v1.GetUserResponse
-	(*GetUsersRequest)(nil),        // 7: proto.v1.GetUsersRequest
-	(*GetUsersResponse)(nil),       // 8: proto.v1.GetUsersResponse
-	(*PatchUserRequest)(nil),       // 9: proto.v1.PatchUserRequest
-	(*PatchUserResponse)(nil),      // 10: proto.v1.PatchUserResponse
-	(*DeleteUserRequest)(nil),      // 11: proto.v1.DeleteUserRequest
-	(*wrapperspb.StringValue)(nil), // 12: google.protobuf.StringValue
-	(*wrapperspb.Int64Value)(nil),  // 13: google.protobuf.Int64Value
-	(*emptypb.Empty)(nil),          // 14: google.protobuf.Empty
+	(*UserInfo)(nil),           // 0: proto.v1.UserInfo
+	(*User)(nil),               // 1: proto.v1.User
+	(*UserPatch)(nil),          // 2: proto.v1.UserPatch
+	(*CreateUserRequest)(nil),  // 3: proto.v1.CreateUserRequest
+	(*CreateUserResponse)(nil), // 4: proto.v1.CreateUserResponse
+	(*GetUserRequest)(nil),     // 5: proto.v1.GetUserRequest
+	(*GetUserResponse)(nil),    // 6: proto.v1.GetUserResponse
+	(*GetUsersRequest)(nil),    // 7: proto.v1.GetUsersRequest
+	(*GetUsersResponse)(nil),   // 8: proto.v1.GetUsersResponse
+	(*PatchUserRequest)(nil),   // 9: proto.v1.PatchUserRequest
+	(*PatchUserResponse)(nil),  // 10: proto.v1.PatchUserResponse
+	(*DeleteUserRequest)(nil),  // 11: proto.v1.DeleteUserRequest
+	(*emptypb.Empty)(nil),      // 12: google.protobuf.Empty
 }
 var file_v1_user_proto_depIdxs = []int32{
-	12, // 0: proto.v1.UserInfo.phone_number:type_name -> google.protobuf.StringValue
-	0,  // 1: proto.v1.User.info:type_name -> proto.v1.UserInfo
-	12, // 2: proto.v1.UserPatch.full_name:type_name -> google.protobuf.StringValue
-	12, // 3: proto.v1.UserPatch.phone_number:type_name -> google.protobuf.StringValue
-	0,  // 4: proto.v1.CreateUserRequest.info:type_name -> proto.v1.UserInfo
-	1,  // 5: proto.v1.CreateUserResponse.user:type_name -> proto.v1.User
-	1,  // 6: proto.v1.GetUserResponse.user:type_name -> proto.v1.User
-	13, // 7: proto.v1.GetUsersRequest.limit:type_name -> google.protobuf.Int64Value
-	13, // 8: proto.v1.GetUsersRequest.offset:type_name -> google.protobuf.Int64Value
-	1,  // 9: proto.v1.GetUsersResponse.users:type_name -> proto.v1.User
-	2,  // 10: proto.v1.PatchUserRequest.patch:type_name -> proto.v1.UserPatch
-	1,  // 11: proto.v1.PatchUserResponse.user:type_name -> proto.v1.User
-	3,  // 12: proto.v1.UsersServiceV1.CreateUser:input_type -> proto.v1.CreateUserRequest
-	5,  // 13: proto.v1.UsersServiceV1.GetUser:input_type -> proto.v1.GetUserRequest
-	7,  // 14: proto.v1.UsersServiceV1.GetUsers:input_type -> proto.v1.GetUsersRequest
-	9,  // 15: proto.v1.UsersServiceV1.PatchUser:input_type -> proto.v1.PatchUserRequest
-	11, // 16: proto.v1.UsersServiceV1.DeleteUser:input_type -> proto.v1.DeleteUserRequest
-	4,  // 17: proto.v1.UsersServiceV1.CreateUser:output_type -> proto.v1.CreateUserResponse
-	6,  // 18: proto.v1.UsersServiceV1.GetUser:output_type -> proto.v1.GetUserResponse
-	8,  // 19: proto.v1.UsersServiceV1.GetUsers:output_type -> proto.v1.GetUsersResponse
-	10, // 20: proto.v1.UsersServiceV1.PatchUser:output_type -> proto.v1.PatchUserResponse
-	14, // 21: proto.v1.UsersServiceV1.DeleteUser:output_type -> google.protobuf.Empty
-	17, // [17:22] is the sub-list for method output_type
-	12, // [12:17] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	0,  // 0: proto.v1.User.info:type_name -> proto.v1.UserInfo
+	0,  // 1: proto.v1.CreateUserRequest.info:type_name -> proto.v1.UserInfo
+	1,  // 2: proto.v1.CreateUserResponse.user:type_name -> proto.v1.User
+	1,  // 3: proto.v1.GetUserResponse.user:type_name -> proto.v1.User
+	1,  // 4: proto.v1.GetUsersResponse.users:type_name -> proto.v1.User
+	2,  // 5: proto.v1.PatchUserRequest.patch:type_name -> proto.v1.UserPatch
+	1,  // 6: proto.v1.PatchUserResponse.user:type_name -> proto.v1.User
+	3,  // 7: proto.v1.UsersServiceV1.CreateUser:input_type -> proto.v1.CreateUserRequest
+	5,  // 8: proto.v1.UsersServiceV1.GetUser:input_type -> proto.v1.GetUserRequest
+	7,  // 9: proto.v1.UsersServiceV1.GetUsers:input_type -> proto.v1.GetUsersRequest
+	9,  // 10: proto.v1.UsersServiceV1.PatchUser:input_type -> proto.v1.PatchUserRequest
+	11, // 11: proto.v1.UsersServiceV1.DeleteUser:input_type -> proto.v1.DeleteUserRequest
+	4,  // 12: proto.v1.UsersServiceV1.CreateUser:output_type -> proto.v1.CreateUserResponse
+	6,  // 13: proto.v1.UsersServiceV1.GetUser:output_type -> proto.v1.GetUserResponse
+	8,  // 14: proto.v1.UsersServiceV1.GetUsers:output_type -> proto.v1.GetUsersResponse
+	10, // 15: proto.v1.UsersServiceV1.PatchUser:output_type -> proto.v1.PatchUserResponse
+	12, // 16: proto.v1.UsersServiceV1.DeleteUser:output_type -> google.protobuf.Empty
+	12, // [12:17] is the sub-list for method output_type
+	7,  // [7:12] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_v1_user_proto_init() }
@@ -708,6 +708,9 @@ func file_v1_user_proto_init() {
 	if File_v1_user_proto != nil {
 		return
 	}
+	file_v1_user_proto_msgTypes[0].OneofWrappers = []any{}
+	file_v1_user_proto_msgTypes[2].OneofWrappers = []any{}
+	file_v1_user_proto_msgTypes[7].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
