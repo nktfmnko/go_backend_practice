@@ -3,6 +3,7 @@ package domain
 import (
 	"fmt"
 	core_error "practice/internal/core/errors"
+	v1 "practice/pkg/pb/v1"
 	"regexp"
 )
 
@@ -25,6 +26,25 @@ func NewUser(id, version int, fullName string, phoneNumber *string) User {
 
 func NewUserUninitialized(fullName string, phoneNumber *string) User {
 	return NewUser(UninitializedID, UninitializedVersion, fullName, phoneNumber)
+}
+
+func (u *User) ToProtoUser() *v1.User {
+	return &v1.User{
+		Id:      int64(u.ID),
+		Version: int64(u.Version),
+		Info: &v1.UserInfo{
+			FullName:    u.FullName,
+			PhoneNumber: u.PhoneNumber,
+		},
+	}
+}
+
+func ProtoSliceFromUsers(domainUsers []User) []*v1.User {
+	res := make([]*v1.User, len(domainUsers))
+	for i, u := range domainUsers {
+		res[i] = u.ToProtoUser()
+	}
+	return res
 }
 
 func (u *User) Validate() error {
@@ -56,6 +76,18 @@ func NewUserPatch(fullName Nullable[string], phoneNumber Nullable[string]) UserP
 	return UserPatch{
 		FullName:    fullName,
 		PhoneNumber: phoneNumber,
+	}
+}
+
+func NewUserPatchFromProto(protoPatch *v1.PatchUserRequest) UserPatch {
+	patch := protoPatch.GetPatch()
+	if patch == nil {
+		return UserPatch{}
+	}
+
+	return UserPatch{
+		FullName:    NewNullableFromPtr(protoPatch.GetPatch().FullName),
+		PhoneNumber: NewNullableFromPtr(protoPatch.GetPatch().PhoneNumber),
 	}
 }
 

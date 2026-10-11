@@ -3,7 +3,10 @@ package domain
 import (
 	"fmt"
 	core_error "practice/internal/core/errors"
+	v1 "practice/pkg/pb/v1"
 	"time"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Task struct {
@@ -41,6 +44,29 @@ func NewTaskUninitialized(title string, description *string, author int) Task {
 		nil,
 		author,
 	)
+}
+
+func (t *Task) ToProto() *v1.Task {
+	return &v1.Task{
+		Id:          int64(t.ID),
+		Version:     int64(t.Version),
+		Completed:   t.Completed,
+		CreatedAt:   timestamppb.New(t.CreatedAt),
+		CompletedAt: nil,
+		Info: &v1.TaskInfo{
+			Title:        t.Title,
+			Description:  t.Description,
+			AuthorUserId: int64(t.AuthorUserID),
+		},
+	}
+}
+
+func NewProtoSliceFromTasks(domainTasks []Task) []*v1.Task {
+	res := make([]*v1.Task, len(domainTasks))
+	for i, t := range domainTasks {
+		res[i] = t.ToProto()
+	}
+	return res
 }
 
 func (t *Task) CompletionDuration() *time.Duration {
@@ -96,6 +122,17 @@ func NewTaskPatch(title Nullable[string], description Nullable[string], complete
 		Title:       title,
 		Description: description,
 		Completed:   completed,
+	}
+}
+
+func NewTaskPatchFromProto(patch *v1.PatchTaskRequest) TaskPatch {
+	if patch.GetPatch() == nil {
+		return TaskPatch{}
+	}
+	return TaskPatch{
+		Title:       NewNullableFromPtr(patch.GetPatch().Title),
+		Description: NewNullableFromPtr(patch.GetPatch().Description),
+		Completed:   NewNullableFromPtr(patch.GetPatch().Completed),
 	}
 }
 
