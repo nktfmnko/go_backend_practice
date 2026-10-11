@@ -8,7 +8,7 @@ import (
 )
 
 func (g *UsersGRPC) GetUsers(ctx context.Context, req *v1.GetUsersRequest) (*v1.GetUsersResponse, error) {
-	users, err := g.usersService.GetUsers(ctx, core_transport_grpc.PtrInt64ToInt(req.Limit), core_transport_grpc.PtrInt64ToInt(req.Offset))
+	users, err := g.usersService.GetUsers(ctx, core_transport_grpc.PtrConvert[int64, int](req.Limit), core_transport_grpc.PtrConvert[int64, int](req.Offset))
 	if err != nil {
 		return nil, core_transport_grpc.ErrorResponse(err, "failed to get users")
 	}

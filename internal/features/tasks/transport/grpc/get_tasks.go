@@ -9,9 +9,9 @@ import (
 
 func (g *TasksGRPC) GetTasks(ctx context.Context, req *v1.GetTasksRequest) (*v1.GetTasksResponse, error) {
 	tasks, err := g.service.GetTasks(ctx,
-		core_transport_grpc.PtrInt64ToInt(req.UserId),
-		core_transport_grpc.PtrInt64ToInt(req.Limit),
-		core_transport_grpc.PtrInt64ToInt(req.Offset),
+		core_transport_grpc.PtrConvert[int64, int](req.UserId),
+		core_transport_grpc.PtrConvert[int64, int](req.Limit),
+		core_transport_grpc.PtrConvert[int64, int](req.Offset),
 	)
 	if err != nil {
 		return nil, core_transport_grpc.ErrorResponse(err, "failed to get tasks")

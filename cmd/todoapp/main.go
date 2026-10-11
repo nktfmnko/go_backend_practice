@@ -17,6 +17,7 @@ import (
 	statistics_postgres_repository "practice/internal/features/statistics/repository/postgres"
 	statistics_service "practice/internal/features/statistics/service"
 	statistics_cache_service "practice/internal/features/statistics/service/cache"
+	statistics_transport_grpc "practice/internal/features/statistics/transport/grpc"
 	statistics_transport_http "practice/internal/features/statistics/transport/http"
 	tasks_postgres_repository "practice/internal/features/tasks/repository/postgres"
 	tasks_redis_repository "practice/internal/features/tasks/repository/redis"
@@ -120,6 +121,7 @@ func main() {
 
 	usersGRPC := users_transport_grpc.NewUsersGRPC(usersService)
 	tasksGRPC := tasks_transport_grpc.NewTasksGRPC(tasksService)
+	statsGRPC := statistics_transport_grpc.NewStatisticsGRPC(statisticsService)
 	grpcServer := core_grpc_server.NewGRPCServer(
 		core_grpc_server.NewConfigMust(),
 		grpc.ChainUnaryInterceptor(
@@ -133,6 +135,8 @@ func main() {
 		v1.RegisterUsersServiceV1Server(server, usersGRPC)
 	}, func(server *grpc.Server) {
 		v1.RegisterTasksServiceV1Server(server, tasksGRPC)
+	}, func(server *grpc.Server) {
+		v1.RegisterStatisticServiceV1Server(server, statsGRPC)
 	})
 
 	g, gCtx := errgroup.WithContext(ctx)
