@@ -2,15 +2,17 @@
 
 <h2>Backend-приложение на Go для управления пользователями и задачами.</h2>
 
-Проект реализует CRUD для пользователей и задач, а также получение статистики по задачам. В проекте используются многослойная архитектура, PostgreSQL, HTTP middleware, валидация, обработка ошибок.
+Проект реализует CRUD для пользователей и задач, а также получение статистики по задачам. В проекте используются многослойная архитектура, PostgreSQL, Redis, net/http, gRPC, валидация, обработка ошибок.
 
 <h3>Стек</h3>
 
 - Go
 - PostgreSQL
+- Redis
 - SQL
 - zap
 - net/http
+- gRPC
 - pgx
 - golang-migrate
 
@@ -19,7 +21,7 @@
 
 HTTP Request → Handler → Service → Repository → PostgreSQL
 
-<h3>API</h3>
+<h3>REST API</h3>
 
 **Users**
 
@@ -111,3 +113,24 @@ curl -X DELETE http://localhost:5050/tasks/1
 ```bash
 curl http://localhost:5050/statistics
 ```
+
+Помимо HTTP-интерфейса, проект поддерживает gRPC API (контракты описаны в директории `api/proto/v1`).
+
+**Сервисы и методы:**
+
+* **`UserService`**
+  * `CreateUser` — Создание пользователя
+  * `GetUser` — Получение пользователя по ID
+  * `GetUsers` — Получение списка пользователей (с пагинацией)
+  * `UpdateUser` — Обновление пользователя
+  * `DeleteUser` — Удаление пользователя
+
+* **`TaskService`**
+  * `CreateTask` — Создание задачи
+  * `GetTask` — Получение задачи по ID
+  * `GetTasks` — Получение списка задач (с пагинацией)
+  * `UpdateTask` — Обновление задачи
+  * `DeleteTask` — Удаление задачи
+
+* **`StatisticsService`**
+  * `GetStatistics` — Получение статистики по задачам
