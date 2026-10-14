@@ -134,3 +134,9 @@ curl http://localhost:5050/statistics
 
 * **`StatisticsService`**
   * `GetStatistics` — Получение статистики по задачам
+
+
+# Запуск проекта
+```bash
+make run
+```
