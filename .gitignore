@@ -2,4 +2,4 @@
 
 /out
 .env
-Makefile
+/build
