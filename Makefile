@@ -9,7 +9,7 @@ export
 build:
 	@go build -o ./build/todoapp ./cmd/todoapp
 
-run: build env-up
+run: build env-up migrate-up
 	./build/todoapp
 
 env-up:
@@ -43,7 +43,7 @@ migrate-create:
 		-dir /migrations \
 		-seq "$(seq)"
 
-migrate-up: env-up
+migrate-up:
 	@make migrate-action action=up
 
 migrate-down:
