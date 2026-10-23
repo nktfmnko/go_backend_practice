@@ -14,6 +14,7 @@ import (
 	core_grpc_server "practice/internal/core/transport/grpc/server"
 	core_http_middleware "practice/internal/core/transport/http/middleware"
 	core_http_server "practice/internal/core/transport/http/server"
+	core_transport "practice/internal/core/transport/limiter"
 	statistics_postgres_repository "practice/internal/features/statistics/repository/postgres"
 	statistics_service "practice/internal/features/statistics/service"
 	statistics_cache_service "practice/internal/features/statistics/service/cache"
@@ -104,12 +105,14 @@ func main() {
 	statisticsTransportHTTP := statistics_transport_http.NewStatisticsHTTPHandler(statisticsCacheService)
 
 	logger.Debug("init HTTP Server")
+	limiter := core_transport.NewIPLimiter(5, 10)
 	httpServer := core_http_server.NewHTTPServer(
 		core_http_server.NewConfigMust(),
 		logger,
 		core_http_middleware.RequestID(),
 		core_http_middleware.Logger(logger),
 		core_http_middleware.Panic(),
+		core_http_middleware.RateLimit(limiter),
 		core_http_middleware.Trace(),
 	)
 	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.APIVersion1)
@@ -128,6 +131,7 @@ func main() {
 			core_grpc_interceptors.RequestIDUnaryServerInterceptor(),
 			core_grpc_interceptors.LoggerUnaryServerInterceptor(logger),
 			core_grpc_interceptors.PanicUnaryServerInterceptor(),
+			core_grpc_interceptors.RateLimitUnaryServerInterceptor(limiter),
 			core_grpc_interceptors.TraceUnaryServerInterceptor(),
 			core_grpc_interceptors.ValidationUnaryServerInterceptor(),
 		))

@@ -1,9 +1,12 @@
 package core_http_middleware
 
 import (
+	"net"
 	"net/http"
+	core_error "practice/internal/core/errors"
 	core_logger "practice/internal/core/logger"
 	core_http_response "practice/internal/core/transport/http/response"
+	core_transport "practice/internal/core/transport/limiter"
 	"time"
 
 	"github.com/google/uuid"
@@ -84,6 +87,28 @@ func Panic() Middleware {
 					)
 				}
 			}()
+
+			next.ServeHTTP(writer, request)
+		})
+	}
+}
+
+func RateLimit(il *core_transport.IPLimiter) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+			ctx := request.Context()
+			log := core_logger.FromContext(ctx)
+			responseHandler := core_http_response.NewHttpResponseHandler(log, writer)
+
+			ip, _, err := net.SplitHostPort(request.RemoteAddr)
+			if err != nil {
+				ip = request.RemoteAddr
+			}
+
+			if !il.Get(ip).Allow() {
+				responseHandler.ErrorResponse(core_error.ErrTooManyRequests, "too many requests")
+				return
+			}
 
 			next.ServeHTTP(writer, request)
 		})

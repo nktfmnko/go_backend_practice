@@ -2,7 +2,9 @@ package core_grpc_interceptors
 
 import (
 	"context"
+	"net"
 	core_logger "practice/internal/core/logger"
+	core_transport "practice/internal/core/transport/limiter"
 	"runtime/debug"
 	"time"
 
@@ -11,6 +13,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
 )
 
@@ -133,6 +136,25 @@ func ValidationUnaryServerInterceptor() grpc.UnaryServerInterceptor {
 			}
 		}
 
+		return handler(ctx, req)
+	}
+}
+
+func RateLimitUnaryServerInterceptor(il *core_transport.IPLimiter) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
+		p, ok := peer.FromContext(ctx)
+		if !ok {
+			return nil, status.Errorf(codes.Internal, "failed to get peer info")
+		}
+
+		ip, _, err := net.SplitHostPort(p.Addr.String())
+		if err != nil {
+			ip = p.Addr.String()
+		}
+
+		if !il.Get(ip).Allow() {
+			return nil, status.Errorf(codes.ResourceExhausted, "too many requests")
+		}
 		return handler(ctx, req)
 	}
 }
