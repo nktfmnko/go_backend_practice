@@ -13,10 +13,10 @@ run: build env-up migrate-up
 	./build/todoapp
 
 env-up:
-	@docker compose up -d --wait todoapp-postgres todoapp-redis port-forwarder redis-port-forwarder
+	@docker compose up -d --wait todoapp-postgres todoapp-redis port-forwarder redis-port-forwarder prometheus
 
 env-down:
-	@docker compose stop redis-port-forwarder port-forwarder todoapp-redis todoapp-postgres
+	@docker compose stop prometheus redis-port-forwarder port-forwarder todoapp-redis todoapp-postgres
 
 env-port-forward:
 	@docker compose up -d --wait todoapp-postgres port-forwarder

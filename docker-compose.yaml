@@ -52,6 +52,15 @@ services:
       - todoapp-redis
     restart: unless-stopped
 
+  prometheus:
+    image: prom/prometheus:main
+    container_name: todoapp-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
 volumes:
   todoapp-pgdata:
   todoapp-redisdata:
+  prometheus_data:

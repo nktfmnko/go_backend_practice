@@ -7,6 +7,7 @@ import (
 	"net/http"
 	core_logger "practice/internal/core/logger"
 	core_http_middleware "practice/internal/core/transport/http/middleware"
+	"practice/metrics"
 
 	"go.uber.org/zap"
 )
@@ -55,6 +56,10 @@ func (s *HTTPServer) Run(ctx context.Context) error {
 		if !errors.Is(err, http.ErrServerClosed) {
 			ch <- err
 		}
+	}()
+
+	go func() {
+		_ = metrics.StartMetricsServer("localhost:5051")
 	}()
 
 	select {

@@ -5,6 +5,7 @@ import (
 	"net"
 	core_logger "practice/internal/core/logger"
 	core_transport "practice/internal/core/transport/limiter"
+	"practice/metrics"
 	"runtime/debug"
 	"time"
 
@@ -156,5 +157,25 @@ func RateLimitUnaryServerInterceptor(il *core_transport.IPLimiter) grpc.UnarySer
 			return nil, status.Errorf(codes.ResourceExhausted, "too many requests")
 		}
 		return handler(ctx, req)
+	}
+}
+
+func MetricsUnaryServerInterceptor() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
+		start := time.Now()
+
+		metrics.IncGRPCInFlight()
+		defer metrics.DecGRPCInFlight()
+
+		res, err := handler(ctx, req)
+
+		duration := time.Since(start).Seconds()
+
+		stCode := status.Code(err)
+
+		metrics.IncGRPCRequests(info.FullMethod, stCode.String())
+		metrics.ObserveGRPCDuration(info.FullMethod, duration)
+
+		return res, err
 	}
 }

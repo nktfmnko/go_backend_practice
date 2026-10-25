@@ -114,6 +114,7 @@ func main() {
 		core_http_middleware.Panic(),
 		core_http_middleware.RateLimit(limiter),
 		core_http_middleware.Trace(),
+		core_http_middleware.Metrics(),
 	)
 	apiVersionRouter := core_http_server.NewAPIVersionRouter(core_http_server.APIVersion1)
 	apiVersionRouter.RegisterRoutes(usersTransportHTTP.Routes()...)
@@ -133,6 +134,7 @@ func main() {
 			core_grpc_interceptors.PanicUnaryServerInterceptor(),
 			core_grpc_interceptors.RateLimitUnaryServerInterceptor(limiter),
 			core_grpc_interceptors.TraceUnaryServerInterceptor(),
+			core_grpc_interceptors.MetricsUnaryServerInterceptor(),
 			core_grpc_interceptors.ValidationUnaryServerInterceptor(),
 		))
 	grpcServer.Register(func(server *grpc.Server) {

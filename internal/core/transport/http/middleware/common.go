@@ -7,6 +7,8 @@ import (
 	core_logger "practice/internal/core/logger"
 	core_http_response "practice/internal/core/transport/http/response"
 	core_transport "practice/internal/core/transport/limiter"
+	"practice/metrics"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -111,6 +113,26 @@ func RateLimit(il *core_transport.IPLimiter) Middleware {
 			}
 
 			next.ServeHTTP(writer, request)
+		})
+	}
+}
+
+func Metrics() Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+			rw := core_http_response.NewResponseWriter(writer)
+			start := time.Now()
+
+			metrics.IncInFlight()
+			defer metrics.DecInFlight()
+
+			next.ServeHTTP(rw, request)
+
+			duration := time.Since(start).Seconds()
+			status := strconv.Itoa(rw.GetStatusCode())
+
+			metrics.IncRequests(request.Method, request.URL.Path, status)
+			metrics.ObserveDuration(request.Method, request.URL.Path, duration)
 		})
 	}
 }
