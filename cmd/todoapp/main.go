@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	sso_grpc "practice/internal/clients/sso/grpc"
 	core_logger "practice/internal/core/logger"
 	core_redis2 "practice/internal/core/repository/cache/redis"
 	"practice/internal/core/repository/postgres/pool/pgx"
@@ -31,6 +32,7 @@ import (
 	users_transport_grpc "practice/internal/features/users/transport/grpc"
 	users_transport_http "practice/internal/features/users/transport/http"
 	v1 "practice/pkg/pb/v1"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -50,6 +52,16 @@ const (
 
 func main() {
 	_ = godotenv.Load()
+
+	secretKey := os.Getenv("APP_SECRET")
+
+	appIDStr := os.Getenv("APP_ID")
+	appID, err := strconv.Atoi(appIDStr)
+	if err != nil {
+		appID = 1
+	}
+	//TODO
+	fmt.Println(secretKey, appID)
 
 	time.Local = timeZone
 
@@ -144,6 +156,13 @@ func main() {
 	}, func(server *grpc.Server) {
 		v1.RegisterStatisticServiceV1Server(server, statsGRPC)
 	})
+
+	ssoClient, err := sso_grpc.New(sso_grpc.NewConfigMust())
+	if err != nil {
+		logger.Fatal("failed to init sso client", zap.Error(err))
+	} else {
+		fmt.Println("подключились", ssoClient)
+	}
 
 	g, gCtx := errgroup.WithContext(ctx)
 

@@ -1,14 +1,18 @@
 package core_http_middleware
 
 import (
+	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	core_error "practice/internal/core/errors"
 	core_logger "practice/internal/core/logger"
+	core_auth "practice/internal/core/transport/auth"
 	core_http_response "practice/internal/core/transport/http/response"
 	core_transport "practice/internal/core/transport/limiter"
 	"practice/metrics"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -92,6 +96,41 @@ func Panic() Middleware {
 
 			next.ServeHTTP(writer, request)
 		})
+	}
+}
+
+func Auth(secret string, appID int) Middleware {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+			ctx := request.Context()
+			log := core_logger.FromContext(ctx)
+			responseHandler := core_http_response.NewHttpResponseHandler(log, writer)
+
+			header := request.Header.Get("Authorization")
+			tokenStr := strings.TrimPrefix(header, "Bearer ")
+			if tokenStr == header || tokenStr == "" {
+				responseHandler.ErrorResponse(core_error.ErrMissingBearerToken, "missing bearer token")
+			}
+
+			claims, err := core_auth.ParseToken(tokenStr, secret, appID)
+			if err != nil {
+				handleAuthError(responseHandler, err)
+				return
+			}
+			ctx = core_auth.WithUser(ctx, claims)
+			next.ServeHTTP(writer, request.WithContext(ctx))
+		})
+	}
+}
+
+func handleAuthError(h *core_http_response.HTTPResponseHandler, err error) {
+	switch {
+	case errors.Is(err, core_auth.ErrWrongApp):
+		h.ErrorResponse(fmt.Errorf("%w: %w", core_error.ErrInvalidToken, err), "token issued for another app")
+	case errors.Is(err, core_auth.ErrInvalidToken):
+		h.ErrorResponse(fmt.Errorf("%w: %w", core_error.ErrInvalidToken, err), "invalid token")
+	default:
+		h.ErrorResponse(err, "failed to parse token")
 	}
 }
 

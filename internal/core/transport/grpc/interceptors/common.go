@@ -2,11 +2,14 @@ package core_grpc_interceptors
 
 import (
 	"context"
+	"errors"
 	"net"
 	core_logger "practice/internal/core/logger"
+	core_auth "practice/internal/core/transport/auth"
 	core_transport "practice/internal/core/transport/limiter"
 	"practice/metrics"
 	"runtime/debug"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -123,6 +126,42 @@ func PanicUnaryServerInterceptor() grpc.UnaryServerInterceptor {
 
 		return handler(ctx, req)
 	}
+}
+
+func AuthUnaryServerInterceptor(secret string, appID int) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok || len(md.Get("authorization")) == 0 {
+			return nil, status.Errorf(codes.Unauthenticated, "metadata not found")
+		}
+
+		authHeader := md.Get("authorization")
+		tokenStr := strings.TrimPrefix(authHeader[0], "Bearer ")
+		if tokenStr == authHeader[0] || tokenStr == "" {
+			return nil, status.Errorf(codes.Unauthenticated, "incorrect token")
+		}
+
+		claims, err := core_auth.ParseToken(tokenStr, secret, appID)
+		if err != nil {
+			return nil, handleAuthError(err)
+		}
+
+		ctx = core_auth.WithUser(ctx, claims)
+		return handler(ctx, req)
+	}
+}
+
+func handleAuthError(err error) error {
+	var authError error
+	switch {
+	case errors.Is(err, core_auth.ErrWrongApp):
+		authError = status.Errorf(codes.PermissionDenied, "incorrect token")
+	case errors.Is(err, core_auth.ErrInvalidToken):
+		authError = status.Errorf(codes.Unauthenticated, "incorrect token")
+	default:
+		return err
+	}
+	return authError
 }
 
 type validator interface {

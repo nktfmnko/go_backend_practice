@@ -50,6 +50,12 @@ func (h *HTTPResponseHandler) ErrorResponse(err error, msg string) {
 	case errors.Is(err, core_error.ErrTooManyRequests):
 		statusCode = http.StatusTooManyRequests
 		logFunc = h.log.Warn
+	case errors.Is(err, core_error.ErrMissingBearerToken), errors.Is(err, core_error.ErrInvalidToken):
+		statusCode = http.StatusUnauthorized
+		logFunc = h.log.Warn
+	case errors.Is(err, core_error.ErrWrongApp):
+		statusCode = http.StatusForbidden
+		logFunc = h.log.Warn
 	default:
 		statusCode = http.StatusInternalServerError
 		logFunc = h.log.Error
