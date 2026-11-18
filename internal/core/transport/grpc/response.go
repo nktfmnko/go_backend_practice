@@ -18,8 +18,16 @@ func ErrorResponse(err error, msg string) error {
 		statusCode = codes.NotFound
 	case errors.Is(err, core_error.ErrConflict):
 		statusCode = codes.AlreadyExists
-	case errors.Is(err, core_error.ErrUnauthenticated):
+	case errors.Is(err, core_error.ErrTooManyRequests):
+		statusCode = codes.ResourceExhausted
+	case errors.Is(err, core_error.ErrMissingBearerToken),
+		errors.Is(err, core_error.ErrInvalidToken),
+		errors.Is(err, core_error.ErrUnauthenticated):
 		statusCode = codes.Unauthenticated
+	case errors.Is(err, core_error.ErrPermissionDenied),
+		errors.Is(err, core_error.ErrWrongApp):
+		statusCode = codes.PermissionDenied
+
 	default:
 		statusCode = codes.Internal
 	}

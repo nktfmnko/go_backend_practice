@@ -28,7 +28,6 @@ type TaskInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Title         string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Description   *string                `protobuf:"bytes,2,opt,name=description,proto3,oneof" json:"description,omitempty"`
-	AuthorUserId  int64                  `protobuf:"varint,3,opt,name=author_user_id,json=authorUserId,proto3" json:"author_user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -75,13 +74,6 @@ func (x *TaskInfo) GetDescription() string {
 		return *x.Description
 	}
 	return ""
-}
-
-func (x *TaskInfo) GetAuthorUserId() int64 {
-	if x != nil {
-		return x.AuthorUserId
-	}
-	return 0
 }
 
 type Task struct {
@@ -652,12 +644,11 @@ var File_v1_task_proto protoreflect.FileDescriptor
 
 const file_v1_task_proto_rawDesc = "" +
 	"\n" +
-	"\rv1/task.proto\x12\bproto.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\"\x94\x01\n" +
+	"\rv1/task.proto\x12\bproto.v1\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x17validate/validate.proto\"n\n" +
 	"\bTaskInfo\x12\x1f\n" +
 	"\x05title\x18\x01 \x01(\tB\t\xfaB\x06r\x04\x10\x01\x18dR\x05title\x121\n" +
 	"\vdescription\x18\x02 \x01(\tB\n" +
-	"\xfaB\ar\x05\x10\x01\x18\xe8\aH\x00R\vdescription\x88\x01\x01\x12$\n" +
-	"\x0eauthor_user_id\x18\x03 \x01(\x03R\fauthorUserIdB\x0e\n" +
+	"\xfaB\ar\x05\x10\x01\x18\xe8\aH\x00R\vdescription\x88\x01\x01B\x0e\n" +
 	"\f_description\"\xf0\x01\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x18\n" +

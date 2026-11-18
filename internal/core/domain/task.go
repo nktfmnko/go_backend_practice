@@ -54,9 +54,8 @@ func (t *Task) ToProto() *v1.Task {
 		CreatedAt:   timestamppb.New(t.CreatedAt),
 		CompletedAt: nil,
 		Info: &v1.TaskInfo{
-			Title:        t.Title,
-			Description:  t.Description,
-			AuthorUserId: int64(t.AuthorUserID),
+			Title:       t.Title,
+			Description: t.Description,
 		},
 	}
 }

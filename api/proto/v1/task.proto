@@ -19,7 +19,6 @@ service TasksServiceV1{
 message TaskInfo{
   string title = 1 [(validate.rules).string = {min_len: 1, max_len:100}];
   optional string description = 2 [(validate.rules).string = {min_len: 1, max_len:1000}];
-  int64 author_user_id = 3;
 }
 
 message Task{

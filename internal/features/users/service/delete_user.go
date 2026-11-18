@@ -12,9 +12,11 @@ func (s *UsersService) DeleteUser(ctx context.Context, targetID int) error {
 	if err != nil {
 		return fmt.Errorf("user unauthenticated: %w", err)
 	}
-	if claims.UserID != targetID || !claims.IsAdmin {
-		return core_error.ErrPermissionDenied
+
+	if claims.UserID != targetID && !claims.IsAdmin {
+		return fmt.Errorf("user %d cant delete user %d: %w", claims.UserID, targetID, core_error.ErrPermissionDenied)
 	}
+
 	if err := s.usersRepository.DeleteUser(ctx, targetID); err != nil {
 		return fmt.Errorf("delete user from repository: %w", err)
 	}

@@ -18,7 +18,7 @@ func NewTasksHTTPHandler(tasksService TasksService) *TasksHTTPHandler {
 type TasksService interface {
 	CreateTask(
 		ctx context.Context,
-		task domain.Task,
+		title string, description *string,
 	) (domain.Task, error)
 	GetTask(
 		ctx context.Context,

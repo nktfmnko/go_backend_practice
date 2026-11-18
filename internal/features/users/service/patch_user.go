@@ -13,9 +13,11 @@ func (s *UsersService) PatchUser(ctx context.Context, targetID int, patch domain
 	if err != nil {
 		return domain.User{}, fmt.Errorf("user unauthenticated: %w", err)
 	}
-	if claims.UserID != targetID || !claims.IsAdmin {
-		return domain.User{}, core_error.ErrPermissionDenied
+
+	if claims.UserID != targetID && !claims.IsAdmin {
+		return domain.User{}, fmt.Errorf("user %d cant patch user %d: %w", claims.UserID, targetID, core_error.ErrPermissionDenied)
 	}
+
 	user, err := s.usersRepository.GetUser(ctx, targetID)
 	if err != nil {
 		return domain.User{}, fmt.Errorf("get user: %w", err)

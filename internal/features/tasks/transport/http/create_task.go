@@ -2,16 +2,14 @@ package tasks_transport_http
 
 import (
 	"net/http"
-	"practice/internal/core/domain"
 	core_logger "practice/internal/core/logger"
 	core_http_request "practice/internal/core/transport/http/request"
 	core_http_response "practice/internal/core/transport/http/response"
 )
 
 type CreateTaskRequest struct {
-	Title        string  `json:"title" validate:"required,min=1,max=100"`
-	Description  *string `json:"description" validate:"omitempty,min=1,max=1000"`
-	AuthorUserID int     `json:"author_user_id" validate:"required"`
+	Title       string  `json:"title" validate:"required,min=1,max=100"`
+	Description *string `json:"description" validate:"omitempty,min=1,max=1000"`
 }
 
 type CreateTaskResponse TaskDTOResponse
@@ -28,9 +26,7 @@ func (h *TasksHTTPHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	taskDomain := domain.NewTaskUninitialized(request.Title, request.Description, request.AuthorUserID)
-
-	taskDomain, err := h.tasksService.CreateTask(ctx, taskDomain)
+	taskDomain, err := h.tasksService.CreateTask(ctx, request.Title, request.Description)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "failed to create task")
 		return
