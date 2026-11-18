@@ -28,6 +28,7 @@ message Task{
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp completed_at = 5;
   TaskInfo info = 6;
+  int64 author_id = 7;
 }
 
 message TaskPatch{

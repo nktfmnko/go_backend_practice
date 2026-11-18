@@ -57,6 +57,7 @@ func (t *Task) ToProto() *v1.Task {
 			Title:       t.Title,
 			Description: t.Description,
 		},
+		AuthorId: int64(t.AuthorUserID),
 	}
 }
 

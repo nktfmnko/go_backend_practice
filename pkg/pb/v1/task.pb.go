@@ -84,6 +84,7 @@ type Task struct {
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	CompletedAt   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=completed_at,json=completedAt,proto3" json:"completed_at,omitempty"`
 	Info          *TaskInfo              `protobuf:"bytes,6,opt,name=info,proto3" json:"info,omitempty"`
+	AuthorId      int64                  `protobuf:"varint,7,opt,name=author_id,json=authorId,proto3" json:"author_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -158,6 +159,13 @@ func (x *Task) GetInfo() *TaskInfo {
 		return x.Info
 	}
 	return nil
+}
+
+func (x *Task) GetAuthorId() int64 {
+	if x != nil {
+		return x.AuthorId
+	}
+	return 0
 }
 
 type TaskPatch struct {
@@ -649,7 +657,7 @@ const file_v1_task_proto_rawDesc = "" +
 	"\x05title\x18\x01 \x01(\tB\t\xfaB\x06r\x04\x10\x01\x18dR\x05title\x121\n" +
 	"\vdescription\x18\x02 \x01(\tB\n" +
 	"\xfaB\ar\x05\x10\x01\x18\xe8\aH\x00R\vdescription\x88\x01\x01B\x0e\n" +
-	"\f_description\"\xf0\x01\n" +
+	"\f_description\"\x8d\x02\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\x03R\aversion\x12\x1c\n" +
@@ -657,7 +665,8 @@ const file_v1_task_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12=\n" +
 	"\fcompleted_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\vcompletedAt\x12&\n" +
-	"\x04info\x18\x06 \x01(\v2\x12.proto.v1.TaskInfoR\x04info\"\x98\x01\n" +
+	"\x04info\x18\x06 \x01(\v2\x12.proto.v1.TaskInfoR\x04info\x12\x1b\n" +
+	"\tauthor_id\x18\a \x01(\x03R\bauthorId\"\x98\x01\n" +
 	"\tTaskPatch\x12\x19\n" +
 	"\x05title\x18\x01 \x01(\tH\x00R\x05title\x88\x01\x01\x12%\n" +
 	"\vdescription\x18\x02 \x01(\tH\x01R\vdescription\x88\x01\x01\x12!\n" +

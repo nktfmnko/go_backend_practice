@@ -274,6 +274,8 @@ func (m *Task) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for AuthorId
+
 	if len(errors) > 0 {
 		return TaskMultiError(errors)
 	}
