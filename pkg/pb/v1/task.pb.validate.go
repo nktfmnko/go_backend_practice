@@ -68,8 +68,6 @@ func (m *TaskInfo) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	// no validation rules for AuthorUserId
-
 	if m.Description != nil {
 
 		if l := utf8.RuneCountInString(m.GetDescription()); l < 1 || l > 1000 {
@@ -275,6 +273,8 @@ func (m *Task) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for AuthorId
 
 	if len(errors) > 0 {
 		return TaskMultiError(errors)

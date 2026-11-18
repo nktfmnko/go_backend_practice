@@ -27,11 +27,11 @@ type UsersService interface {
 	) (domain.User, error)
 	DeleteUser(
 		ctx context.Context,
-		id int,
+		targetID int,
 	) error
 	PatchUser(
 		ctx context.Context,
-		id int,
+		targetID int,
 		patch domain.UserPatch,
 	) (domain.User, error)
 }

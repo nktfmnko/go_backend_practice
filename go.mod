@@ -5,16 +5,19 @@ go 1.26.0
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.3.3
 	github.com/go-playground/validator/v10 v10.30.5
+	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
+	github.com/jackc/pgerrcode v0.0.0-20250907135507-afb5586c32a6
 	github.com/jackc/pgx/v5 v5.11.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/nktfmnko/sso_protos v0.0.1
 	github.com/prometheus/client_golang v1.25.0
 	github.com/redis/go-redis/v9 v9.23.0
 	go.uber.org/zap v1.28.0
 	golang.org/x/sync v0.24.0
 	golang.org/x/time v0.16.0
-	google.golang.org/grpc v1.84.0
+	google.golang.org/grpc v1.85.0
 	google.golang.org/protobuf v1.36.12
 )
 
