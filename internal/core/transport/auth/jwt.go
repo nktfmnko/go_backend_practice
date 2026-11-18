@@ -10,11 +10,13 @@ import (
 var (
 	ErrInvalidToken = errors.New("invalid token")
 	ErrWrongApp     = errors.New("token issued for another app")
+	ErrMissingClaim = errors.New("invalid token: missing required claims")
 )
 
 type UserClaims struct {
-	UserID int
-	Email  string
+	UserID  int
+	Email   string
+	IsAdmin bool
 }
 
 func ParseToken(tokenString, appSecret string, expectedAppID int) (UserClaims, error) {
@@ -29,6 +31,10 @@ func ParseToken(tokenString, appSecret string, expectedAppID int) (UserClaims, e
 		return UserClaims{}, fmt.Errorf("%w:%v", ErrInvalidToken, err)
 	}
 
+	return parseToken(token, expectedAppID)
+}
+
+func parseToken(token *jwt.Token, expectedAppID int) (UserClaims, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return UserClaims{}, ErrInvalidToken
@@ -41,13 +47,22 @@ func ParseToken(tokenString, appSecret string, expectedAppID int) (UserClaims, e
 
 	uidFloat, ok := claims["uid"].(float64)
 	if !ok {
-		return UserClaims{}, ErrInvalidToken
+		return UserClaims{}, ErrMissingClaim
 	}
 
-	email, _ := claims["email"].(string)
+	email, ok := claims["email"].(string)
+	if !ok {
+		return UserClaims{}, ErrMissingClaim
+	}
+
+	isAdmin, ok := claims["is_admin"].(bool)
+	if !ok {
+		return UserClaims{}, ErrMissingClaim
+	}
 
 	return UserClaims{
-		UserID: int(uidFloat),
-		Email:  email,
+		UserID:  int(uidFloat),
+		Email:   email,
+		IsAdmin: isAdmin,
 	}, nil
 }
