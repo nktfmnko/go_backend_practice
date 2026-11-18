@@ -13,7 +13,7 @@ var (
 )
 
 type UserClaims struct {
-	UserID int64
+	UserID int
 	Email  string
 }
 
@@ -47,7 +47,7 @@ func ParseToken(tokenString, appSecret string, expectedAppID int) (UserClaims, e
 	email, _ := claims["email"].(string)
 
 	return UserClaims{
-		UserID: int64(uidFloat),
+		UserID: int(uidFloat),
 		Email:  email,
 	}, nil
 }

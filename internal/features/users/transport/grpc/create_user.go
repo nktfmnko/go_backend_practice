@@ -2,6 +2,7 @@ package users_transport_grpc
 
 import (
 	"context"
+	core_auth "practice/internal/core/transport/auth"
 	core_transport_grpc "practice/internal/core/transport/grpc"
 	v1 "practice/pkg/pb/v1"
 
@@ -10,11 +11,16 @@ import (
 )
 
 func (g *UsersGRPC) CreateUser(ctx context.Context, req *v1.CreateUserRequest) (*v1.CreateUserResponse, error) {
+	claims, err := core_auth.MustUserFromContext(ctx)
+	if err != nil {
+		return nil, core_transport_grpc.ErrorResponse(err, "unauthenticated")
+	}
+
 	if req.GetInfo() == nil {
 		return nil, status.Error(codes.InvalidArgument, "user info is required")
 	}
 
-	user, err := g.usersService.CreateUser(ctx, req.GetInfo().GetFullName(), req.GetInfo().PhoneNumber)
+	user, err := g.usersService.CreateUser(ctx, claims.UserID, req.GetInfo().GetFullName(), req.GetInfo().PhoneNumber)
 	if err != nil {
 		return nil, core_transport_grpc.ErrorResponse(err, "failed to create user")
 	}

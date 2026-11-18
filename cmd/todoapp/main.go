@@ -60,8 +60,6 @@ func main() {
 	if err != nil {
 		appID = 1
 	}
-	//TODO
-	fmt.Println(secretKey, appID)
 
 	time.Local = timeZone
 
@@ -145,6 +143,7 @@ func main() {
 			core_grpc_interceptors.LoggerUnaryServerInterceptor(logger),
 			core_grpc_interceptors.PanicUnaryServerInterceptor(),
 			core_grpc_interceptors.RateLimitUnaryServerInterceptor(limiter),
+			core_grpc_interceptors.AuthUnaryServerInterceptor(secretKey, appID),
 			core_grpc_interceptors.TraceUnaryServerInterceptor(),
 			core_grpc_interceptors.MetricsUnaryServerInterceptor(),
 			core_grpc_interceptors.ValidationUnaryServerInterceptor(),

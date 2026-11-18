@@ -18,6 +18,8 @@ func ErrorResponse(err error, msg string) error {
 		statusCode = codes.NotFound
 	case errors.Is(err, core_error.ErrConflict):
 		statusCode = codes.AlreadyExists
+	case errors.Is(err, core_error.ErrUnauthenticated):
+		statusCode = codes.Unauthenticated
 	default:
 		statusCode = codes.Internal
 	}

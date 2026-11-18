@@ -16,5 +16,4 @@ func (g *UsersGRPC) GetUsers(ctx context.Context, req *v1.GetUsersRequest) (*v1.
 	resp := domain.ProtoSliceFromUsers(users)
 
 	return &v1.GetUsersResponse{Users: resp}, nil
-
 }

@@ -1,6 +1,9 @@
 package core_auth
 
-import "context"
+import (
+	"context"
+	core_error "practice/internal/core/errors"
+)
 
 type ctxKey string
 
@@ -13,4 +16,12 @@ func WithUser(ctx context.Context, u UserClaims) context.Context {
 func UserFromContext(ctx context.Context) (UserClaims, bool) {
 	u, ok := ctx.Value(userClaimsKey).(UserClaims)
 	return u, ok
+}
+
+func MustUserFromContext(ctx context.Context) (UserClaims, error) {
+	claims, ok := UserFromContext(ctx)
+	if !ok {
+		return UserClaims{}, core_error.ErrUnauthenticated
+	}
+	return claims, nil
 }

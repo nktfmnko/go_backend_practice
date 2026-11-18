@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"practice/internal/core/domain"
 	core_logger "practice/internal/core/logger"
+	core_auth "practice/internal/core/transport/auth"
 	core_http_request "practice/internal/core/transport/http/request"
 	core_http_response "practice/internal/core/transport/http/response"
 	core_http_types "practice/internal/core/transport/http/types"
@@ -52,6 +53,12 @@ func (h *UsersHTTPHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 
 	responseHandler := core_http_response.NewHttpResponseHandler(logger, w)
 
+	claims, err := core_auth.MustUserFromContext(ctx)
+	if err != nil {
+		responseHandler.ErrorResponse(err, "unauthenticated")
+		return
+	}
+
 	userId, err := core_http_request.GetIntPathValue(r, "id")
 	if err != nil {
 		responseHandler.ErrorResponse(err, "fail to get user id")
@@ -66,7 +73,7 @@ func (h *UsersHTTPHandler) PatchUser(w http.ResponseWriter, r *http.Request) {
 
 	userPatch := domain.NewUserPatch(request.FullName.ToDomain(), request.PhoneNumber.ToDomain())
 
-	userDomain, err := h.usersService.PatchUser(ctx, userId, userPatch)
+	userDomain, err := h.usersService.PatchUser(ctx, claims.UserID, userId, userPatch)
 	if err != nil {
 		responseHandler.ErrorResponse(err, "fail to patch user")
 		return

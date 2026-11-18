@@ -14,6 +14,7 @@ type UsersHTTPHandler struct {
 type UsersService interface {
 	CreateUser(
 		ctx context.Context,
+		id int,
 		fullName string,
 		phoneNumber *string,
 	) (domain.User, error)
@@ -27,11 +28,11 @@ type UsersService interface {
 	) (domain.User, error)
 	DeleteUser(
 		ctx context.Context,
-		id int,
+		actorID, targetID int,
 	) error
 	PatchUser(
 		ctx context.Context,
-		id int,
+		actorID, targetID int,
 		patch domain.UserPatch,
 	) (domain.User, error)
 }
